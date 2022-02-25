@@ -20,12 +20,15 @@ class Board:
     COLOR_PLAYER_2 = (0, 0, 255)
     WIDTH_PLAYER_1 = 5
     WIDTH_PLAYER_2 = 5
+    COLOR_BACKGROUND_PLAYER_1 = (255, 150, 150)
+    COLOR_BACKGROUND_PLAYER_2 = (150, 150, 255)
 
     def __init__(self):
         self.resetGrid()
 
     def resetGrid(self):
         self.grid = np.zeros((3,3,3,3), dtype=int).tolist()
+        self.largeGrid = np.zeros((3,3), dtype=int).tolist()
 
     def getSizeLargeCell(self):
         return (boardSize-self.WIDTH_LARGE_GRID) / 3.
@@ -51,15 +54,28 @@ class Board:
         return (px, py)
 
     def draw(self):
-        screen.fill(self.COLOR_BACKGROUND)
+        # Large grid background
+        s = self.getSizeLargeCell()
+        for ix in range(3):
+            for iy in range(3):
+                gridValue = self.largeGrid[ix][iy]
+                pos = self.getLargeTopLeftPx(ix, iy)
+                color = self.COLOR_BACKGROUND
+                if gridValue == 1:
+                    color = self.COLOR_BACKGROUND_PLAYER_1
+                elif gridValue == 2:
+                    color = self.COLOR_BACKGROUND_PLAYER_2
+                pygame.draw.rect(screen, color, (pos[0], pos[1], pos[0] + s, pos[1] + s))
+                
 
-        # Small grid
+
+        # Small grid lines
         for i in range(10):
             pos = 0.5*self.WIDTH_LARGE_GRID + (boardSize-self.WIDTH_LARGE_GRID) * i / 9. - 1
             pygame.draw.line(screen, self.COLOR_SMALL_GRID, (pos,0), (pos,boardSize), width = self.WIDTH_SMALL_GRID) # Vertical
             pygame.draw.line(screen, self.COLOR_SMALL_GRID, (0,pos), (boardSize,pos), width = self.WIDTH_SMALL_GRID) # Horizontal
 
-        # Large grid
+        # Large grid lines
         for i in range(4):
             pos = self.getLargeTopLeftPx(i,0)[0]
             pygame.draw.line(screen, self.COLOR_LARGE_GRID, (pos,0), (pos,boardSize), width = self.WIDTH_LARGE_GRID) # Vertical
