@@ -2,6 +2,9 @@ import pygame
 import time
 import numpy as np
 
+def current_milli_time():
+    return round(time.time() * 1000)
+
 start_time = time.time()
 pygame.init()
 
@@ -22,6 +25,9 @@ class Board:
     WIDTH_PLAYER_2 = 5
     COLOR_BACKGROUND_PLAYER_1 = (255, 150, 150)
     COLOR_BACKGROUND_PLAYER_2 = (150, 150, 255)
+    
+    COLOR_BACKGROUND_AVAILABLE = (210,210,210)
+    TIME_BLINK_AVAILABLE = 500 # ms
 
 
     def checkWinBoard(grid):
@@ -118,7 +124,7 @@ class Board:
         py += 0.5 * self.getSizeSmallCell()
         return (px, py)
 
-    def draw(self):
+    def draw(self, blinkAvailableCells = True):
         # Large grid background
         s = self.getSizeLargeCell()
         for ix in range(3):
@@ -130,6 +136,10 @@ class Board:
                     color = self.COLOR_BACKGROUND_PLAYER_1
                 elif gridValue == 2:
                     color = self.COLOR_BACKGROUND_PLAYER_2
+                elif blinkAvailableCells: # Blink possible moves
+                    if self.possible[ix][iy]:
+                        if current_milli_time() % Board.TIME_BLINK_AVAILABLE > 0.5 * Board.TIME_BLINK_AVAILABLE:
+                            color = Board.COLOR_BACKGROUND_AVAILABLE
                 pygame.draw.rect(screen, color, (pos[0], pos[1], pos[0] + s, pos[1] + s))
 
         # Small grid lines
@@ -162,7 +172,6 @@ class Board:
 
 board = Board()
 board.play(1,1,1,1)
-board.play(1,1,1,0)
 
 if __name__ == '__main__':
 
