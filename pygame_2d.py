@@ -72,6 +72,10 @@ class Board:
         self.updatePossible(ixSmall, iySmall)
         return 0
 
+    def click(self, px, py):
+        (ixLarge, iyLarge, ixSmall, iySmall) = Board.getCellFromPx(px, py)
+        self.play(ixLarge, iyLarge, ixSmall, iySmall)
+
     def checkWinLargeCell(self, ix, iy):
         g = self.grid[ix][iy]
         res = Board.checkWinBoard(g)
@@ -100,6 +104,16 @@ class Board:
                 elif np.count_nonzero(np.array(self.grid[ix][iy])) == 0: # If the cell is full
                     available[ix][iy] = False
         return available
+
+    def getCellFromPx(px, py):
+        start = Board.getLargeTopLeftPx(0,0)
+        ixLarge = int((px - start[0]) // Board.getSizeLargeCell())
+        iyLarge = int((py - start[1]) // Board.getSizeLargeCell())
+        px2 = px - start[0] - ixLarge * Board.getSizeLargeCell()
+        py2 = py - start[1] - iyLarge * Board.getSizeLargeCell()
+        ixSmall = int(px2 // Board.getSizeSmallCell())
+        iySmall = int(py2 // Board.getSizeSmallCell())
+        return (ixLarge, iyLarge, ixSmall, iySmall)
 
     def getSizeLargeCell():
         return (Board.SIZE-Board.WIDTH_LARGE_GRID) / 3.
@@ -172,7 +186,6 @@ class Board:
 
 screen = pygame.display.set_mode((Board.SIZE, Board.SIZE))
 board = Board()
-board.play(1,1,1,1)
 
 if __name__ == '__main__':
 
@@ -183,6 +196,9 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game = False
+            if event.type == pygame.MOUSEBUTTONUP:
+                x, y = pygame.mouse.get_pos()
+                board.click(x, y)
 
         # Draws things on screen
 
