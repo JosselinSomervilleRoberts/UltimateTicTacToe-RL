@@ -8,11 +8,11 @@ def current_milli_time():
 start_time = time.time()
 pygame.init()
 
-boardSize = 910
-screen = pygame.display.set_mode((boardSize, boardSize))
 
 
 class Board:
+    SIZE = 910
+
     COLOR_BACKGROUND = (255,255,255)
     COLOR_LARGE_GRID = (50, 50, 50 )
     COLOR_SMALL_GRID = (120,120,120)
@@ -101,41 +101,41 @@ class Board:
                     available[ix][iy] = False
         return available
 
-    def getSizeLargeCell(self):
-        return (boardSize-self.WIDTH_LARGE_GRID) / 3.
+    def getSizeLargeCell():
+        return (Board.SIZE-Board.WIDTH_LARGE_GRID) / 3.
 
-    def getSizeSmallCell(self):
-        return (boardSize-self.WIDTH_LARGE_GRID) / 9.
+    def getSizeSmallCell():
+        return (Board.SIZE-Board.WIDTH_LARGE_GRID) / 9.
 
-    def getLargeTopLeftPx(self, ix, iy):
-        px = 0.5*self.WIDTH_LARGE_GRID + ix * self.getSizeLargeCell() - 1
-        py = 0.5*self.WIDTH_LARGE_GRID + iy * self.getSizeLargeCell() - 1
+    def getLargeTopLeftPx(ix, iy):
+        px = 0.5*Board.WIDTH_LARGE_GRID + ix * Board.getSizeLargeCell() - 1
+        py = 0.5*Board.WIDTH_LARGE_GRID + iy * Board.getSizeLargeCell() - 1
         return (px, py)
 
-    def getSmallTopLeftPx(self, ixLarge, iyLarge, ixSmall, iySmall):
-        (pxLarge, pyLarge) = self.getLargeTopLeftPx(ixLarge, iyLarge)
-        px = pxLarge + ixSmall * self.getSizeSmallCell()
-        py = pyLarge + iySmall * self.getSizeSmallCell()
+    def getSmallTopLeftPx(ixLarge, iyLarge, ixSmall, iySmall):
+        (pxLarge, pyLarge) = Board.getLargeTopLeftPx(ixLarge, iyLarge)
+        px = pxLarge + ixSmall * Board.getSizeSmallCell()
+        py = pyLarge + iySmall * Board.getSizeSmallCell()
         return (px, py)
 
-    def getSmallMidddlePx(self, ixLarge, iyLarge, ixSmall, iySmall):
-        (px, py) = self.getSmallTopLeftPx(ixLarge, iyLarge, ixSmall, iySmall)
-        px += 0.5 * self.getSizeSmallCell()
-        py += 0.5 * self.getSizeSmallCell()
+    def getSmallMidddlePx(ixLarge, iyLarge, ixSmall, iySmall):
+        (px, py) = Board.getSmallTopLeftPx(ixLarge, iyLarge, ixSmall, iySmall)
+        px += 0.5 * Board.getSizeSmallCell()
+        py += 0.5 * Board.getSizeSmallCell()
         return (px, py)
 
     def draw(self, blinkAvailableCells = True):
         # Large grid background
-        s = self.getSizeLargeCell()
+        s = Board.getSizeLargeCell()
         for ix in range(3):
             for iy in range(3):
                 gridValue = self.largeGrid[ix][iy]
-                pos = self.getLargeTopLeftPx(ix, iy)
-                color = self.COLOR_BACKGROUND
+                pos = Board.getLargeTopLeftPx(ix, iy)
+                color = Board.COLOR_BACKGROUND
                 if gridValue == 1:
-                    color = self.COLOR_BACKGROUND_PLAYER_1
+                    color = Board.COLOR_BACKGROUND_PLAYER_1
                 elif gridValue == 2:
-                    color = self.COLOR_BACKGROUND_PLAYER_2
+                    color = Board.COLOR_BACKGROUND_PLAYER_2
                 elif blinkAvailableCells: # Blink possible moves
                     if self.possible[ix][iy]:
                         if current_milli_time() % Board.TIME_BLINK_AVAILABLE > 0.5 * Board.TIME_BLINK_AVAILABLE:
@@ -144,32 +144,33 @@ class Board:
 
         # Small grid lines
         for i in range(10):
-            pos = 0.5*self.WIDTH_LARGE_GRID + (boardSize-self.WIDTH_LARGE_GRID) * i / 9. - 1
-            pygame.draw.line(screen, self.COLOR_SMALL_GRID, (pos,0), (pos,boardSize), width = self.WIDTH_SMALL_GRID) # Vertical
-            pygame.draw.line(screen, self.COLOR_SMALL_GRID, (0,pos), (boardSize,pos), width = self.WIDTH_SMALL_GRID) # Horizontal
+            pos = 0.5 * Board.WIDTH_LARGE_GRID + (Board.SIZE - Board.WIDTH_LARGE_GRID) * i / 9. - 1
+            pygame.draw.line(screen, Board.COLOR_SMALL_GRID, (pos,0), (pos,Board.SIZE), width = Board.WIDTH_SMALL_GRID) # Vertical
+            pygame.draw.line(screen, Board.COLOR_SMALL_GRID, (0,pos), (Board.SIZE,pos), width = Board.WIDTH_SMALL_GRID) # Horizontal
 
         # Large grid lines
         for i in range(4):
-            pos = self.getLargeTopLeftPx(i,0)[0]
-            pygame.draw.line(screen, self.COLOR_LARGE_GRID, (pos,0), (pos,boardSize), width = self.WIDTH_LARGE_GRID) # Vertical
-            pygame.draw.line(screen, self.COLOR_LARGE_GRID, (0,pos), (boardSize,pos), width = self.WIDTH_LARGE_GRID) # Horizontal
+            pos = Board.getLargeTopLeftPx(i,0)[0]
+            pygame.draw.line(screen, Board.COLOR_LARGE_GRID, (pos,0), (pos,Board.SIZE), width = Board.WIDTH_LARGE_GRID) # Vertical
+            pygame.draw.line(screen, Board.COLOR_LARGE_GRID, (0,pos), (Board.SIZE,pos), width = Board.WIDTH_LARGE_GRID) # Horizontal
 
         # Draw player moves
-        inc = 0.35 * self.getSizeSmallCell()
+        inc = 0.35 * Board.getSizeSmallCell()
         for ixLarge in range(3):
             for iyLarge in range(3):
                 for ixSmall in range(3):
                     for iySmall in range(3):
                         gridValue = self.grid[ixLarge][iyLarge][ixSmall][iySmall]
-                        pos = self.getSmallMidddlePx(ixLarge, iyLarge, ixSmall, iySmall)
+                        pos = Board.getSmallMidddlePx(ixLarge, iyLarge, ixSmall, iySmall)
                         if gridValue == 1: # Crosses
-                            pygame.draw.line(screen, self.COLOR_PLAYER_1, (pos[0] - inc, pos[1] - inc), (pos[0] + inc, pos[1] + inc), width = self.WIDTH_PLAYER_1)
-                            pygame.draw.line(screen, self.COLOR_PLAYER_1, (pos[0] - inc, pos[1] + inc), (pos[0] + inc, pos[1] - inc), width = self.WIDTH_PLAYER_1)
+                            pygame.draw.line(screen, Board.COLOR_PLAYER_1, (pos[0] - inc, pos[1] - inc), (pos[0] + inc, pos[1] + inc), width = Board.WIDTH_PLAYER_1)
+                            pygame.draw.line(screen, Board.COLOR_PLAYER_1, (pos[0] - inc, pos[1] + inc), (pos[0] + inc, pos[1] - inc), width = Board.WIDTH_PLAYER_1)
                         elif gridValue == 2: # Circles
-                            pygame.draw.ellipse(screen, self.COLOR_PLAYER_2, (pos[0] - inc, pos[1] - inc, 2*inc, 2*inc), width = self.WIDTH_PLAYER_2)
+                            pygame.draw.ellipse(screen, Board.COLOR_PLAYER_2, (pos[0] - inc, pos[1] - inc, 2*inc, 2*inc), width = Board.WIDTH_PLAYER_2)
 
 
 
+screen = pygame.display.set_mode((Board.SIZE, Board.SIZE))
 board = Board()
 board.play(1,1,1,1)
 
