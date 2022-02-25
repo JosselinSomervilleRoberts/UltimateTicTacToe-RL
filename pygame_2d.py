@@ -1,37 +1,29 @@
 import pygame
 import time
+from board import Board
 
-start_time = time.time()
+
+# Initialize game environment
 pygame.init()
-
-win_dim = 800
-screen = pygame.display.set_mode((win_dim, win_dim))
-
-
-
-
-def draw_board():
-    screen.fill((255,255,255))
+screen = pygame.display.set_mode((Board.SIZE, Board.SIZE + Board.BOTTOM_SIZE))
+board = Board()
 
 
 if __name__ == '__main__':
 
     game = True
-    while game:
+    while game: # While the game is running
         pygame.time.delay(1)
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT: # Quit cross
                 game = False
-
-        # Draws things on screen
-
-        draw_board()
-
-        # Updates movements and events
+            if event.type == pygame.MOUSEBUTTONUP: # Mouse click released
+                x, y = pygame.mouse.get_pos()
+                board.click(x, y)
 
         # Update display
+        board.draw(screen)
+        pygame.display.flip()
 
-        pygame.display.update()
-
-    pygame.QUIT()
+    pygame.quit()
