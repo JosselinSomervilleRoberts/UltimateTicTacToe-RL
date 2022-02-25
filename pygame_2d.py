@@ -45,6 +45,13 @@ class Board:
 
         return 0
 
+    def gridIsFull(grid):
+        for ix in range(3):
+            for iy in range(3):
+                if grid[ix][iy] == 0:
+                    return False
+        return True
+
     def __init__(self):
         self.reset()
 
@@ -87,11 +94,15 @@ class Board:
                 # TODO: Display a winning message
 
     def updatePossible(self, ix, iy):
-        if self.largeGrid[ix][ix] != 0: # If the cell is already won, play anywhere
+        print("UPDATE POSSIBLE", ix, iy)
+        if self.largeGrid[ix][iy] != 0: # If the cell is already won, play anywhere
+            print("Already WON")
             self.possible = self.getAvailableLargeCells()
-        elif np.count_nonzero(np.array(self.grid[ix][iy])) == 0: # If the cell is full play anywhere
+        elif Board.gridIsFull(self.grid[ix][iy]): # If the cell is full play anywhere
+            print("Cell full")
             self.possible = self.getAvailableLargeCells()
         else: # The cell is not won and not full, play in this one
+            print("OK TP")
             self.possible = [[False for _ in range(3)] for _ in range(3)]
             self.possible[ix][iy] = True
             
@@ -101,7 +112,7 @@ class Board:
             for iy in range(3):
                 if self.largeGrid[ix][iy] != 0: # If the cell is already won
                     available[ix][iy] = False
-                elif np.count_nonzero(np.array(self.grid[ix][iy])) == 0: # If the cell is full
+                elif Board.gridIsFull(self.grid[ix][iy]): # If the cell is full
                     available[ix][iy] = False
         return available
 
@@ -150,7 +161,7 @@ class Board:
                     color = Board.COLOR_BACKGROUND_PLAYER_1
                 elif gridValue == 2:
                     color = Board.COLOR_BACKGROUND_PLAYER_2
-                elif blinkAvailableCells: # Blink possible moves
+                elif blinkAvailableCells and (self.state == 0): # Blink possible moves
                     if self.possible[ix][iy]:
                         if current_milli_time() % Board.TIME_BLINK_AVAILABLE > 0.5 * Board.TIME_BLINK_AVAILABLE:
                             color = Board.COLOR_BACKGROUND_AVAILABLE
