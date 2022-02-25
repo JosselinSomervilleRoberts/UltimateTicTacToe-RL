@@ -293,8 +293,15 @@ class Board:
         '''
         Interface for the player. Plays a move where the mouse was clicked
         INPUT; px, py (pixel coordinates of the click)
-        NO OUTPUT -> Plays the move
+        Output: Error number
+            - 0: everything went fine
+            - 1: the game is not running (not initiated or already won)
+            - 2: the player cannot play in the desired large cell
+            - 3: the desired small cell is not available (already occupied)
+            - 4: the cell clicked is out of bounds
         '''
         (ixLarge, iyLarge, ixSmall, iySmall) = Board.getCellFromPx(px, py)
-        self.play(ixLarge, iyLarge, ixSmall, iySmall)
+        if (ixLarge >= 3) or (iyLarge >= 3) or (ixSmall >= 3) or (iySmall >= 3): # Out of bounds
+            return 4
+        return self.play(ixLarge, iyLarge, ixSmall, iySmall)
     # ========================================================= #
