@@ -129,6 +129,7 @@ class Board:
 
     def reset(self):
         '''Resets the game'''
+        self.r = 0
         self.resetGrid()
         self.currentPlayer = 1
         self.text = "Player 1 plays"
@@ -186,9 +187,17 @@ class Board:
         res = Board.checkWinBoard(g)
         if res != 0:
             self.largeGrid[ix][iy] = res
+            if res == 2:
+                self.r = 10
+            else:
+                self.r = -30
             resWin = Board.checkWinBoard(self.largeGrid)
             if resWin != 0: # A player won
                 self.state = resWin
+                if resWin == 2:
+                    self.r += 100
+                else:
+                    self.r += -300
 
                 # Display winning message
                 self.textColor = Board.COLOR_PLAYER_2
@@ -303,4 +312,20 @@ class Board:
         if (ixLarge >= 3) or (iyLarge >= 3) or (ixSmall >= 3) or (iySmall >= 3): # Out of bounds
             return 4
         return self.play(ixLarge, iyLarge, ixSmall, iySmall)
+
+    def getListOfPossibleMoves(self):
+        '''
+        Returns all possible moves (for minimax)
+        NO INPUT
+        Output: list of moves (a move is represented as an int: 27 * ixLarge + 9* iyLarge + 3*ixSmall + iySmall)
+        '''
+        moves = []
+        for ixLarge in range(3):
+            for iyLarge in range(3):
+                if self.possible[ixLarge][iyLarge]:
+                    for ixSmall in range(3):
+                        for iySmall in range(3):
+                            if self.grid[ixLarge][iyLarge][ixSmall][iySmall] == 0:
+                                moves.append(27 * ixLarge + 9* iyLarge + 3*ixSmall + iySmall)
+        return moves
     # ========================================================= #
