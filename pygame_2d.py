@@ -12,6 +12,7 @@ pygame.init()
 
 class Board:
     SIZE = 910
+    BOTTOM_SIZE = 80
 
     COLOR_BACKGROUND = (255,255,255)
     COLOR_LARGE_GRID = (50, 50, 50 )
@@ -28,6 +29,7 @@ class Board:
     
     COLOR_BACKGROUND_AVAILABLE = (210,210,210)
     TIME_BLINK_AVAILABLE = 500 # ms
+    FONT = pygame.font.Font(None, 50)
 
 
     def checkWinBoard(grid):
@@ -58,6 +60,8 @@ class Board:
     def reset(self):
         self.resetGrid()
         self.currentPlayer = 1
+        self.text = "Player 1 plays"
+        self.textColor = Board.COLOR_PLAYER_1
         self.state = 0
         self.possible = [[True for _ in range(3)] for _ in range(3)]
 
@@ -77,6 +81,14 @@ class Board:
         self.currentPlayer = 3 - self.currentPlayer # Swap player
         self.checkWinLargeCell(ixLarge, iyLarge)
         self.updatePossible(ixSmall, iySmall)
+
+        # Text
+        if self.state == 0:
+            self.text = "Player " + str(self.currentPlayer) + " plays"
+            self.textColor = Board.COLOR_PLAYER_2
+            if self.currentPlayer == 1:
+                self.textColor = Board.COLOR_PLAYER_1
+
         return 0
 
     def click(self, px, py):
@@ -91,7 +103,12 @@ class Board:
             resWin = Board.checkWinBoard(self.largeGrid)
             if resWin != 0: # A player won
                 self.state = resWin
-                # TODO: Display a winning message
+
+                # Display winning message
+                self.textColor = Board.COLOR_PLAYER_2
+                if resWin == 1:
+                    self.textColor = Board.COLOR_PLAYER_1
+                self.text = "Player " + str(self.state) + " won !"
 
     def updatePossible(self, ix, iy):
         print("UPDATE POSSIBLE", ix, iy)
@@ -165,7 +182,7 @@ class Board:
                     if self.possible[ix][iy]:
                         if current_milli_time() % Board.TIME_BLINK_AVAILABLE > 0.5 * Board.TIME_BLINK_AVAILABLE:
                             color = Board.COLOR_BACKGROUND_AVAILABLE
-                pygame.draw.rect(screen, color, (pos[0], pos[1], pos[0] + s, pos[1] + s))
+                pygame.draw.rect(screen, color, (pos[0], pos[1], s, s))
 
         # Small grid lines
         for i in range(10):
@@ -193,9 +210,15 @@ class Board:
                         elif gridValue == 2: # Circles
                             pygame.draw.ellipse(screen, Board.COLOR_PLAYER_2, (pos[0] - inc, pos[1] - inc, 2*inc, 2*inc), width = Board.WIDTH_PLAYER_2)
 
+        # Text
+        pygame.draw.rect(screen, Board.COLOR_BACKGROUND, (0, Board.SIZE, Board.SIZE, Board.BOTTOM_SIZE))
+        text = Board.FONT.render(self.text, True, self.textColor)
+        text_rect = text.get_rect(center=(Board.SIZE / 2., Board.SIZE + Board.BOTTOM_SIZE / 2.))
+        screen.blit(text, text_rect)
 
 
-screen = pygame.display.set_mode((Board.SIZE, Board.SIZE))
+
+screen = pygame.display.set_mode((Board.SIZE, Board.SIZE + Board.BOTTOM_SIZE))
 board = Board()
 
 if __name__ == '__main__':
