@@ -64,6 +64,7 @@ class Board:
         self.currentPlayer = 3 - self.currentPlayer # Swap player
         self.checkWinLargeCell(ixLarge, iyLarge)
         self.updatePossible(ixSmall, iySmall)
+        return 0
 
     def checkWinLargeCell(self, ix, iy):
         g = self.grid[ix][iy]
@@ -76,7 +77,23 @@ class Board:
                 # TODO: Display a winning message
 
     def updatePossible(self, ix, iy):
-        pass
+        if self.largeGrid[ix][ix] != 0: # If the cell is already won, play anywhere
+            self.possible = self.getAvailableLargeCells()
+        elif np.count_nonzero(np.array(self.grid[ix][iy])) == 0: # If the cell is full play anywhere
+            self.possible = self.getAvailableLargeCells()
+        else: # The cell is not won and not full, play in this one
+            self.possible = [[False for _ in range(3)] for _ in range(3)]
+            self.possible[ix][iy] = True
+            
+    def getAvailableLargeCells(self):
+        available = [[True for _ in range(3)] for _ in range(3)]
+        for ix in range(3):
+            for iy in range(3):
+                if self.largeGrid[ix][iy] != 0: # If the cell is already won
+                    available[ix][iy] = False
+                elif np.count_nonzero(np.array(self.grid[ix][iy])) == 0: # If the cell is full
+                    available[ix][iy] = False
+        return available
 
     def getSizeLargeCell(self):
         return (boardSize-self.WIDTH_LARGE_GRID) / 3.
@@ -144,6 +161,8 @@ class Board:
 
 
 board = Board()
+board.play(1,1,1,1)
+board.play(1,1,1,0)
 
 if __name__ == '__main__':
 
