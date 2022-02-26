@@ -28,6 +28,6 @@ if __name__ == '__main__':
                 game = False
             # Render the game
             env.render()
-        
+
     pygame.quit()
     env.close()
