@@ -298,6 +298,17 @@ class Board:
     
 
     # ======================= INTERFACES ====================== #
+    def getActionFromClick(self, px, py):
+        '''
+        Interface for the player. Returns the action corresponding to the click
+        INPUT; px, py (pixel coordinates of the click)
+        Output: Action number (in the action space)
+        '''
+        (ixLarge, iyLarge, ixSmall, iySmall) = Board.getCellFromPx(px, py)
+        if (ixLarge >= 3) or (iyLarge >= 3) or (ixSmall >= 3) or (iySmall >= 3): # Out of bounds
+            return -1
+        return 27*ixLarge + 9*iyLarge + 3*ixSmall + iySmall
+        
     def click(self, px, py):
         '''
         Interface for the player. Plays a move where the mouse was clicked
