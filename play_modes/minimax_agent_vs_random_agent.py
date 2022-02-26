@@ -3,7 +3,7 @@ import pygame
 
 
 
-def minimax(env, cumulated_reward = 0, step = 0):
+def minimax(env, cumulated_reward = 0, step = 0, maximize = True):
     STEP_MAX = 4
 
     actions = env.valid_actions()
@@ -15,13 +15,14 @@ def minimax(env, cumulated_reward = 0, step = 0):
 
         obs, reward, done, info = env.step(action)
         r = cumulated_reward + reward
+        a = None
 
         if not(done) and step + 1 < STEP_MAX:
-            _, r = minimax(env, r, step + 1)
+            a, r = minimax(env, cumulated_reward + reward, step + 1, not(maximize))
         
-        if (chosenMove is None) or (step%2==0 and r > chosenReward) or (step%2==1 and r < chosenReward):
+        if (chosenMove is None) or (maximize and (r < chosenReward)) or (not(maximize) and (r > chosenReward)):
             chosenReward = r
-            chosenMove = action
+            chosenMove = (action, a)
 
         env.restoreFromState(state)
 
@@ -36,7 +37,7 @@ if __name__ == '__main__':
     while game:
         pygame.time.delay(1)
 
-        if env.pygame.board.currentPlayer == 1: # Player
+        if env.pygame.board.currentPlayer == 2: # Random agent
             # Take a random action
             action = env.action_space.sample()
             obs, reward, done, info = env.step(action)
@@ -48,7 +49,10 @@ if __name__ == '__main__':
         else: # Agent
             # Take a random action
             action, expected_reward = minimax(env)
-            obs, reward, done, info = env.step(action)
+            print("Action:", action)
+            print("Expected reward:", expected_reward)
+            print("")
+            obs, reward, done, info = env.step(action[0])
             if done == True:
                 game = False
             # Render the game

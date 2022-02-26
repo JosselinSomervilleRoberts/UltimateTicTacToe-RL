@@ -183,6 +183,7 @@ class Board:
         Checks if a player won the large cell queried. If so, it also checks if the player globally won the game
         Input: ix, iy (indexes of the large cell)
         NO OUTPUT -> Automatically updates self.largeGrid and self.state'''
+        self.r = 0
         g = self.grid[ix][iy]
         res = Board.checkWinBoard(g)
         if res != 0:
@@ -195,9 +196,9 @@ class Board:
             if resWin != 0: # A player won
                 self.state = resWin
                 if resWin == 2:
-                    self.r += 100
+                    self.r = 100
                 else:
-                    self.r += -300
+                    self.r = -100
 
                 # Display winning message
                 self.textColor = Board.COLOR_PLAYER_2
