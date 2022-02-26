@@ -27,11 +27,11 @@ def minimax(env, stepMax, cumulated_reward = 0, step = 0, maximize = True):
 class MinimaxAgent(Agent):
 
     def __init__(self, player = 1, stepMax = 4):
-        super().__init__(self)
+        super().__init__(player)
         self.stepMax = stepMax
 
     def getAction(self, env, observation):
-        action, expected_reward = minimax(env, self.stepMax)
+        action, expected_reward = minimax(env, self.stepMax, maximize=(self.player == 1))
         return action
 
     
