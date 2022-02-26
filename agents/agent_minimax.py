@@ -3,13 +3,13 @@ from agents.agent import Agent
 
 def minimax(env, stepMax, cumulated_reward = 0, step = 0, maximize = True):
     actions = env.valid_actions()
-    state = env.getState()
 
     chosenMove = None
     chosenReward = 0
     for action in actions:
 
-        obs, reward, done, info = env.step(action)
+        reward, done = env.fast_step(action)
+        move = env.getLastMove()
         r = cumulated_reward + reward
 
         if not(done) and step + 1 < stepMax:
@@ -19,7 +19,7 @@ def minimax(env, stepMax, cumulated_reward = 0, step = 0, maximize = True):
             chosenReward = r
             chosenMove = action
 
-        env.restoreFromState(state)
+        env.undoMove(move)
 
     return chosenMove, chosenReward
 

@@ -155,19 +155,29 @@ class Board:
             - 1: the game is not running (not initiated or already won)
             - 2: the player cannot play in the desired large cell
             - 3: the desired small cell is not available (already occupied)
+        Move played (to reverse)
         '''
         if self.state != 0:
-            return 1 # Move not aload since the game is already finished
+            return 1, None # Move not aload since the game is already finished
         if not(self.possible[ixLarge,iyLarge]):
-            return 2 # Move not aload since not in the correct large cell
+            return 2, None # Move not aload since not in the correct large cell
         elif self.grid[ixLarge,iyLarge,ixSmall,iySmall] != 0:
-            return 3 # Move not aload since the small cell is already occupied
+            return 3, None # Move not aload since the small cell is already occupied
 
         self.reward_reset()
-        self.grid[ixLarge,iyLarge,ixSmall,iySmall] = self.currentPlayer # Play
+
+        # Play
+        self.grid[ixLarge,iyLarge,ixSmall,iySmall] = self.currentPlayer 
+        move = [self.possible.copy(), (ixLarge,iyLarge,ixSmall,iySmall)]
         self.reward_update_playing_on(ixLarge, iyLarge, ixSmall, iySmall)
-        self.checkWinLargeCell(ixLarge, iyLarge)
+
+        # Check if a cell or the game is won
+        self.checkWinLargeCell(ixLarge, iyLarge, move)
+
+        # Update possibilities
         self.updatePossible(ixSmall, iySmall)
+
+        # Update player
         self.currentPlayer = 3 - self.currentPlayer # Swap player
 
         # Text
@@ -178,9 +188,9 @@ class Board:
                 self.textColor = Board.COLOR_PLAYER_1
 
         # Everything went fine
-        return 0
+        return 0, move
 
-    def checkWinLargeCell(self, ix, iy):
+    def checkWinLargeCell(self, ix, iy, move):
         '''
         Checks if a player won the large cell queried. If so, it also checks if the player globally won the game
         Input: ix, iy (indexes of the large cell)
@@ -188,8 +198,12 @@ class Board:
         g = self.grid[ix,iy]
         res = Board.checkWinBoard(g)
         if res != 0:
+            # Win lage cell
             self.largeGrid[ix,iy] = res
             self.reward_update_winning_large_cell(ix, iy)
+            move.append((ix, iy))
+
+            # Check if the game was won
             resWin = Board.checkWinBoard(self.largeGrid)
             if resWin != 0: # A player won
                 self.state = resWin
@@ -362,7 +376,7 @@ class Board:
         '''
         (ixLarge, iyLarge, ixSmall, iySmall) = Board.getCellFromPx(px, py)
         if (ixLarge >= 3) or (iyLarge >= 3) or (ixSmall >= 3) or (iySmall >= 3): # Out of bounds
-            return 4
+            return 4, None
         return self.play(ixLarge, iyLarge, ixSmall, iySmall)
 
     def getListOfPossibleMoves(self):

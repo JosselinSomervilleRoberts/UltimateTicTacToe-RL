@@ -10,6 +10,7 @@ class UltimateTicTacToe:
         self.screen = pygame.display.set_mode((Board.SIZE, Board.SIZE + Board.BOTTOM_SIZE))
         self.board = Board()
         self.error = 0
+        self.move = None
         self.action_space = gym.spaces.Discrete(81)
         self.observation_space = gym.spaces.MultiDiscrete([3]*81)
 
@@ -27,7 +28,7 @@ class UltimateTicTacToe:
         iyLarge = action % 3
         action = int((action - iyLarge) // 3)
         ixLarge = action % 3
-        self.error = self.board.play(ixLarge, iyLarge, ixSmall, iySmall)
+        self.error, self.move = self.board.play(ixLarge, iyLarge, ixSmall, iySmall)
 
     def evaluate(self):
         return self.board.reward

@@ -22,6 +22,12 @@ class UltimateTicTacToeEnv(gym.Env):
         done = self.pygame.is_done()
         return obs, reward, done, {}
 
+    def fast_step(self, action):
+        self.pygame.do_action(action)
+        reward = self.pygame.evaluate()
+        done = self.pygame.is_done()
+        return reward, done
+
     def render(self, mode="human", close=False):
         self.pygame.view(False)
 
@@ -39,3 +45,14 @@ class UltimateTicTacToeEnv(gym.Env):
         b.possible = state[2].copy()
         b.currentPlayer = state[3]
         b.state = state[4]
+
+    def getLastMove(self):
+        return self.pygame.move
+
+    def undoMove(self, move):
+        if move is None or len(move) == 0: return
+        self.pygame.board.possible = move[0]
+        self.pygame.board.grid[move[1]] = 0
+        if len(move) > 2: self.pygame.board.largeGrid[move[2]] = 0
+        self.pygame.board.currentPlayer = 3 - self.pygame.board.currentPlayer
+        self.pygame.board.state = 0

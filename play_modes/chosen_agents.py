@@ -7,7 +7,7 @@ from agents.agent_minimax import MinimaxAgent
 
 agent2 = MinimaxAgent(2)
 agent1 = RandomAgent(1)
-display = True
+display = False
 
 if __name__ == '__main__':
     env = UltimateTicTacToeEnv()
