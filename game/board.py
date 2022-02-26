@@ -236,12 +236,17 @@ class Board:
         Output: 3x3 boolean matrix filled accordingly to the availableness of a large cell
         '''
         available = np.array([[True for _ in range(3)] for _ in range(3)])
+        nbFull = 0
         for ix in range(3):
             for iy in range(3):
                 if self.largeGrid[ix,iy] != 0: # If the cell is already won
                     available[ix,iy] = False
+                    nbFull += 1
                 elif Board.gridIsFull(self.grid[ix,iy]): # If the cell is full
                     available[ix,iy] = False
+                    nbFull += 1
+        if nbFull == 9:
+            self.state = 3
         return available
     # ========================================================= #
 
