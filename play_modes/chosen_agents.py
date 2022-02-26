@@ -4,10 +4,11 @@ import pygame
 from agents.agent_player import PlayerAgent
 from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
+from agents.agent_minimax_pruning import MinimaxPruningAgent
 
-agent2 = MinimaxAgent(2)
-agent1 = RandomAgent(1)
-display = False
+agent2 = MinimaxPruningAgent(2, 6)
+agent1 = PlayerAgent(1)
+display = True
 
 if __name__ == '__main__':
     env = UltimateTicTacToeEnv()
