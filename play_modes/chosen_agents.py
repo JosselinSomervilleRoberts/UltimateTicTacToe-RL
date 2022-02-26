@@ -3,8 +3,9 @@ import pygame
 
 from agents.agent_player import PlayerAgent
 from agents.agent_random import RandomAgent
+from agents.agent_minimax import MinimaxAgent
 
-agent1 = RandomAgent(1)
+agent1 = MinimaxAgent(1)
 agent2 = RandomAgent(2)
 display = True
 
