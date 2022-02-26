@@ -129,7 +129,7 @@ class Board:
 
     def reset(self):
         '''Resets the game'''
-        self.r = 0
+        self.reward_reset()
         self.resetGrid()
         self.currentPlayer = 1
         self.text = "Player 1 plays"
@@ -163,10 +163,12 @@ class Board:
         elif self.grid[ixLarge][iyLarge][ixSmall][iySmall] != 0:
             return 3 # Move not aload since the small cell is already occupied
 
+        self.reward_reset()
         self.grid[ixLarge][iyLarge][ixSmall][iySmall] = self.currentPlayer # Play
-        self.currentPlayer = 3 - self.currentPlayer # Swap player
+        self.reward_update_playing_on(ixLarge, iyLarge, ixSmall, iySmall)
         self.checkWinLargeCell(ixLarge, iyLarge)
         self.updatePossible(ixSmall, iySmall)
+        self.currentPlayer = 3 - self.currentPlayer # Swap player
 
         # Text
         if self.state == 0:
@@ -183,22 +185,15 @@ class Board:
         Checks if a player won the large cell queried. If so, it also checks if the player globally won the game
         Input: ix, iy (indexes of the large cell)
         NO OUTPUT -> Automatically updates self.largeGrid and self.state'''
-        self.r = 0
         g = self.grid[ix][iy]
         res = Board.checkWinBoard(g)
         if res != 0:
             self.largeGrid[ix][iy] = res
-            if res == 2:
-                self.r = 10
-            else:
-                self.r = -30
+            self.reward_update_winning_large_cell(ix, iy)
             resWin = Board.checkWinBoard(self.largeGrid)
             if resWin != 0: # A player won
                 self.state = resWin
-                if resWin == 2:
-                    self.r = 100
-                else:
-                    self.r = -100
+                self.reward_update_winning()
 
                 # Display winning message
                 self.textColor = Board.COLOR_PLAYER_2
@@ -234,6 +229,51 @@ class Board:
                 elif Board.gridIsFull(self.grid[ix][iy]): # If the cell is full
                     available[ix][iy] = False
         return available
+    # ========================================================= #
+
+
+
+    # =================== REWARD FUNCTIONS ==================== #
+    def reward_reset(self):
+        '''
+        Simply resets the reward to zero
+        '''
+        self.reward = 0
+
+    def reward_update(self, reward):
+        '''
+        Updates self.reward considering the sign based on the current player
+        INPUT: reward of the move
+        NO OUTPUT -> updates self.reward
+        '''
+        self.reward += reward * (3 - 2*self.currentPlayer)
+
+    def reward_update_playing_on(self, ixLarge, iyLarge, ixSmall, iySmall):
+        '''
+        Updates the reward playing in the given cell
+        INPUT: ixLarge, iyLarge, ixSmall, iySmall (indexes of the small cell)
+        NO OUTPUT -> updates self.reward
+        '''
+        # TODO: do it
+        pass
+
+    def reward_update_winning_large_cell(self, ixLarge, iyLarge):
+        '''
+        Updates the reward winning a given large cell
+        INPUT: ixLarge, iyLarge (indexes of the large cell)
+        NO OUTPUT -> updates self.reward
+        '''
+        reward = 10 # TODO: Change
+        self.reward_update(reward)
+
+    def reward_update_winning(self):
+        '''
+        Updates the reward winning the game
+        NO INPUT
+        NO OUTPUT -> updates self.reward
+        '''
+        reward = 100
+        self.reward_update(reward)
     # ========================================================= #
 
 

@@ -30,7 +30,7 @@ class UltimateTicTacToe:
         self.error = self.board.play(ixLarge, iyLarge, ixSmall, iySmall)
 
     def evaluate(self):
-        return self.board.r
+        return self.board.reward
 
     def view(self, blink):
         self.board.draw(self.screen, blink)
