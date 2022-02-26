@@ -30,12 +30,12 @@ class UltimateTicTacToeEnv(gym.Env):
 
     def getState(self):
         b = self.pygame.board
-        return (np.array(b.grid).copy(), np.array(b.largeGrid).copy(), np.array(b.possible).copy(), b.currentPlayer, b.state)
+        return (b.grid.copy(), b.largeGrid.copy(), b.possible.copy(), b.currentPlayer, b.state)
 
     def restoreFromState(self, state):
         b = self.pygame.board
-        b.grid = state[0].copy().tolist()
-        b.largeGrid = state[1].copy().tolist()
-        b.possible = state[2].copy().tolist()
+        b.grid = state[0].copy()
+        b.largeGrid = state[1].copy()
+        b.possible = state[2].copy()
         b.currentPlayer = state[3]
         b.state = state[4]

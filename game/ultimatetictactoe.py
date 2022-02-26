@@ -14,7 +14,7 @@ class UltimateTicTacToe:
         self.observation_space = gym.spaces.MultiDiscrete([3]*81)
 
     def observe(self):
-        return np.array(self.board.grid).flatten()
+        return self.board.grid.flatten()
 
     def is_done(self):
         return (self.board.state != 0)

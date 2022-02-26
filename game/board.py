@@ -37,16 +37,16 @@ class Board:
         Output: True if a line of plays exists (classic tic tac toe)
         '''
         for i in range(3):
-            if grid[i][0] == grid[i][1] == grid[i][2] != 0:
-                return grid[i][0]
-            if grid[0][i] == grid[1][i] == grid[2][i] != 0:
-                return grid[0][i]
+            if grid[i,0] == grid[i,1] == grid[i,2] != 0:
+                return grid[i,0]
+            if grid[0,i] == grid[1,i] == grid[2,i] != 0:
+                return grid[0,i]
 
         # Diagonals
-        if grid[0][0] == grid[1][1] == grid[2][2] != 0:
-            return grid[0][0]
-        if grid[0][2] == grid[1][1] == grid[2][0] != 0:
-            return grid[0][2]
+        if grid[0,0] == grid[1,1] == grid[2,2] != 0:
+            return grid[0,0]
+        if grid[0,2] == grid[1,1] == grid[2,0] != 0:
+            return grid[0,2]
 
         return 0
 
@@ -58,7 +58,7 @@ class Board:
         '''
         for ix in range(3):
             for iy in range(3):
-                if grid[ix][iy] == 0:
+                if grid[ix,iy] == 0:
                     return False
         return True
     # ========================================================= #
@@ -135,12 +135,12 @@ class Board:
         self.text = "Player 1 plays"
         self.textColor = Board.COLOR_PLAYER_1
         self.state = 0
-        self.possible = [[True for _ in range(3)] for _ in range(3)]
+        self.possible = np.array([[True for _ in range(3)] for _ in range(3)])
 
     def resetGrid(self):
         '''Builds empty grids (large and normal)'''
-        self.grid = np.zeros((3,3,3,3), dtype=int).tolist()
-        self.largeGrid = np.zeros((3,3), dtype=int).tolist()
+        self.grid = np.zeros((3,3,3,3), dtype=int)
+        self.largeGrid = np.zeros((3,3), dtype=int)
     # ========================================================= #
 
 
@@ -158,13 +158,13 @@ class Board:
         '''
         if self.state != 0:
             return 1 # Move not aload since the game is already finished
-        if not(self.possible[ixLarge][iyLarge]):
+        if not(self.possible[ixLarge,iyLarge]):
             return 2 # Move not aload since not in the correct large cell
-        elif self.grid[ixLarge][iyLarge][ixSmall][iySmall] != 0:
+        elif self.grid[ixLarge,iyLarge,ixSmall,iySmall] != 0:
             return 3 # Move not aload since the small cell is already occupied
 
         self.reward_reset()
-        self.grid[ixLarge][iyLarge][ixSmall][iySmall] = self.currentPlayer # Play
+        self.grid[ixLarge,iyLarge,ixSmall,iySmall] = self.currentPlayer # Play
         self.reward_update_playing_on(ixLarge, iyLarge, ixSmall, iySmall)
         self.checkWinLargeCell(ixLarge, iyLarge)
         self.updatePossible(ixSmall, iySmall)
@@ -185,10 +185,10 @@ class Board:
         Checks if a player won the large cell queried. If so, it also checks if the player globally won the game
         Input: ix, iy (indexes of the large cell)
         NO OUTPUT -> Automatically updates self.largeGrid and self.state'''
-        g = self.grid[ix][iy]
+        g = self.grid[ix,iy]
         res = Board.checkWinBoard(g)
         if res != 0:
-            self.largeGrid[ix][iy] = res
+            self.largeGrid[ix,iy] = res
             self.reward_update_winning_large_cell(ix, iy)
             resWin = Board.checkWinBoard(self.largeGrid)
             if resWin != 0: # A player won
@@ -207,13 +207,13 @@ class Board:
         Input:  ix, iy (indexes of the large cell just played)
         NO OUTPUT -> Automatically updates self.possible
         '''
-        if self.largeGrid[ix][iy] != 0: # If the cell is already won, play anywhere
+        if self.largeGrid[ix,iy] != 0: # If the cell is already won, play anywhere
             self.possible = self.getAvailableLargeCells()
-        elif Board.gridIsFull(self.grid[ix][iy]): # If the cell is full play anywhere
+        elif Board.gridIsFull(self.grid[ix,iy]): # If the cell is full play anywhere
             self.possible = self.getAvailableLargeCells()
         else: # The cell is not won and not full, play in this one
-            self.possible = [[False for _ in range(3)] for _ in range(3)]
-            self.possible[ix][iy] = True
+            self.possible = np.array([[False for _ in range(3)] for _ in range(3)])
+            self.possible[ix,iy] = True
             
     def getAvailableLargeCells(self):
         '''
@@ -221,13 +221,13 @@ class Board:
         NO INPUT
         Output: 3x3 boolean matrix filled accordingly to the availableness of a large cell
         '''
-        available = [[True for _ in range(3)] for _ in range(3)]
+        available = np.array([[True for _ in range(3)] for _ in range(3)])
         for ix in range(3):
             for iy in range(3):
-                if self.largeGrid[ix][iy] != 0: # If the cell is already won
-                    available[ix][iy] = False
-                elif Board.gridIsFull(self.grid[ix][iy]): # If the cell is full
-                    available[ix][iy] = False
+                if self.largeGrid[ix,iy] != 0: # If the cell is already won
+                    available[ix,iy] = False
+                elif Board.gridIsFull(self.grid[ix,iy]): # If the cell is full
+                    available[ix,iy] = False
         return available
     # ========================================================= #
 
@@ -289,7 +289,7 @@ class Board:
         s = Board.getSizeLargeCell()
         for ix in range(3):
             for iy in range(3):
-                gridValue = self.largeGrid[ix][iy]
+                gridValue = self.largeGrid[ix,iy]
                 pos = Board.getLargeTopLeftPx(ix, iy)
                 color = Board.COLOR_BACKGROUND
                 if gridValue == 1:
@@ -297,7 +297,7 @@ class Board:
                 elif gridValue == 2:
                     color = Board.COLOR_BACKGROUND_PLAYER_2
                 elif blinkAvailableCells and (self.state == 0): # Blink possible moves
-                    if self.possible[ix][iy]:
+                    if self.possible[ix,iy]:
                         if current_milli_time() % Board.TIME_BLINK_AVAILABLE > 0.5 * Board.TIME_BLINK_AVAILABLE:
                             color = Board.COLOR_BACKGROUND_AVAILABLE
                 pygame.draw.rect(screen, color, (pos[0], pos[1], s, s))
@@ -320,7 +320,7 @@ class Board:
             for iyLarge in range(3):
                 for ixSmall in range(3):
                     for iySmall in range(3):
-                        gridValue = self.grid[ixLarge][iyLarge][ixSmall][iySmall]
+                        gridValue = self.grid[ixLarge,iyLarge,ixSmall,iySmall]
                         pos = Board.getSmallMidddlePx(ixLarge, iyLarge, ixSmall, iySmall)
                         if gridValue == 1: # Crosses
                             pygame.draw.line(screen, Board.COLOR_PLAYER_1, (pos[0] - inc, pos[1] - inc), (pos[0] + inc, pos[1] + inc), width = Board.WIDTH_PLAYER_1)
@@ -374,10 +374,10 @@ class Board:
         moves = []
         for ixLarge in range(3):
             for iyLarge in range(3):
-                if self.possible[ixLarge][iyLarge]:
+                if self.possible[ixLarge,iyLarge]:
                     for ixSmall in range(3):
                         for iySmall in range(3):
-                            if self.grid[ixLarge][iyLarge][ixSmall][iySmall] == 0:
+                            if self.grid[ixLarge,iyLarge,ixSmall,iySmall] == 0:
                                 moves.append(27 * ixLarge + 9* iyLarge + 3*ixSmall + iySmall)
         return moves
     # ========================================================= #
