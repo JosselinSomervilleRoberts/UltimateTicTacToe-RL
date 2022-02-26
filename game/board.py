@@ -125,6 +125,7 @@ class Board:
     def __init__(self):
         '''Constructor (automatically reset on construct)'''
         self.reset()
+        self.reward_factor = 1.5
         Board.FONT = pygame.font.Font(None, 50)
 
     def reset(self):
@@ -265,7 +266,10 @@ class Board:
         INPUT: reward of the move
         NO OUTPUT -> updates self.reward
         '''
-        self.reward += reward * (3 - 2*self.currentPlayer)
+        if self.currentPlayer == 1:
+            self.reward += reward
+        else:
+            self.reward -= self.reward_factor * reward
 
     def reward_update_playing_on(self, ixLarge, iyLarge, ixSmall, iySmall):
         '''

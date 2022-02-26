@@ -1,5 +1,3 @@
-from argparse import _ActionsContainer
-from json.encoder import INFINITY
 from agents.agent import Agent
 import random
 INFINITY = 1000
@@ -59,6 +57,7 @@ class MinimaxPruningAgent(Agent):
 
     def getAction(self, env, observation):
         action, expected_reward = minimaxPruning(env, self.stepMax, maximize=(self.player == 1), rand=self.rand)
+        print("Expected reward:", expected_reward)
         return action
 
     
