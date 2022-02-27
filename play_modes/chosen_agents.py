@@ -6,8 +6,8 @@ from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
 
-agent1 = MinimaxPruningAgent(1, 2, True)
 agent2 = PlayerAgent(2)
+agent1 = MinimaxPruningAgent(1, 6, True)
 display = True
 
 if __name__ == '__main__':
@@ -30,6 +30,7 @@ if __name__ == '__main__':
         # Otherwise, if the action is valid we play it in the env
         elif action < 81:
             obs, reward, done, info = env.step(action)
+            print("REWARD:", reward)
 
         if display:
             # Render the environment
