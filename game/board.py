@@ -347,7 +347,7 @@ class Board:
                 elif Board.gridIsFull(self.grid[ix,iy]): # If the cell is full
                     available[ix,iy] = False
                     nbFull += 1
-        if nbFull == 9:
+        if self.state == 0 and nbFull == 9:
             self.state = 3
         return available
     # ========================================================= #

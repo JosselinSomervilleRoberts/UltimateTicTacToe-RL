@@ -6,7 +6,7 @@ from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
 
-agent2 = PlayerAgent(2)
+agent2 = MinimaxPruningAgent(2, 6, True)
 agent1 = MinimaxPruningAgent(1, 6, True)
 display = True
 
