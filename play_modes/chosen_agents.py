@@ -7,7 +7,7 @@ from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
 
 agent2 = MinimaxPruningAgent(2, 6, True)
-agent1 = MinimaxPruningAgent(1, 6, True)
+agent1 = RandomAgent(1)
 display = True
 
 if __name__ == '__main__':
