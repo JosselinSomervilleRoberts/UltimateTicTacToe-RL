@@ -100,10 +100,12 @@ class DQNAgent(Agent):
         valid_actions = env.valid_actions()
         observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
         q= self.q.forward(observation)
-        #action = torch.argmax(q)
+        action = torch.argmax(q)
         mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
-        rewards = np.ravel(np.array(q))
-        action = np.argmax(rewards[mask])
+        action = torch.argmax(q)
+        while not mask[int(action)] :
+            q[int(action)] = -100000
+            action = torch.argmax(q)
         return int(action)
 
     def pickActionMaybeRandom(self, env, observation):
@@ -147,7 +149,7 @@ class DQNAgent(Agent):
 
     def learnNN(self,env):
         n_hidden_episodes = 10
-        n_episodes = 1000
+        n_episodes = 100 #1000
         for episode in range(n_episodes):
             state = env.reset()           # resetting the environment after each episode
             score = 0

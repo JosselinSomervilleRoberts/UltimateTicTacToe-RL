@@ -12,6 +12,7 @@ from agents.agent_player import PlayerAgent
 from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
+from agents.agent_dqn import DQNAgent
 
 agent2 = MinimaxPruningAgent(2, 6, True)
 agent1 = RandomAgent(1)
