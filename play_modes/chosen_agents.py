@@ -6,15 +6,17 @@ sys.path.append("C:\\Users\\Marie\\Organisation_Marie\\X\\3A\\INF 581 - Advanced
 '''
 
 from envs.env_two_player import TwoPlayerEnv
+from envs.env_single_player import SinglePlayerEnv
 import pygame
 
 from agents.agent_player import PlayerAgent
 from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
+from agents.agent_dqn import DQNAgent
 
-agent2 = MinimaxPruningAgent(2, 6, True)
-agent1 = RandomAgent(1)
+agent2 = RandomAgent(2) #, 6, True)
+agent1 = DQNAgent(1,SinglePlayerEnv(RandomAgent(2)))
 display = True
 
 if __name__ == '__main__':
