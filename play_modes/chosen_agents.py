@@ -1,9 +1,9 @@
 
-'''
+
 # necessary for Marie
 import sys
 sys.path.append("C:\\Users\\Marie\\Organisation_Marie\\X\\3A\\INF 581 - Advanced machine learning\\Project\\UltimateTicTacToe-RL")
-'''
+
 
 from envs.env_two_player import TwoPlayerEnv
 from envs.env_single_player import SinglePlayerEnv

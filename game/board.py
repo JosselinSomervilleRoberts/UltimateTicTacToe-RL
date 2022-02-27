@@ -8,8 +8,8 @@ def current_milli_time():
 
 
 class Board:
-    SIZE = 910
-    BOTTOM_SIZE = 80
+    SIZE = 600 #810
+    BOTTOM_SIZE = 66 #90
 
     COLOR_BACKGROUND = (255,255,255)
     COLOR_LARGE_GRID = (50, 50, 50 )
@@ -23,7 +23,7 @@ class Board:
     WIDTH_PLAYER_2 = 5
     COLOR_BACKGROUND_PLAYER_1 = (255, 150, 150)
     COLOR_BACKGROUND_PLAYER_2 = (150, 150, 255)
-    
+
     COLOR_BACKGROUND_AVAILABLE = (210,210,210)
     TIME_BLINK_AVAILABLE = 500 # ms
     FONT = None
@@ -109,7 +109,7 @@ class Board:
                 if addToUsed:
                     for i in range(3):
                         used.add((i,j))
-                
+
             # Diagonale 1
             nb1 = 0
             nb2 = 0
@@ -269,7 +269,7 @@ class Board:
         self.reward_reset()
 
         # Play
-        self.grid[ixLarge,iyLarge,ixSmall,iySmall] = self.currentPlayer 
+        self.grid[ixLarge,iyLarge,ixSmall,iySmall] = self.currentPlayer
         move = [self.possible.copy(), (ixLarge,iyLarge,ixSmall,iySmall)]
         self.reward_update_playing_on(ixLarge, iyLarge, ixSmall, iySmall)
 
@@ -330,7 +330,7 @@ class Board:
         else: # The cell is not won and not full, play in this one
             self.possible = np.array([[False for _ in range(3)] for _ in range(3)])
             self.possible[ix,iy] = True
-            
+
     def getAvailableLargeCells(self):
         '''
         Checks all larges cells that are available (not won and not full)
@@ -465,7 +465,7 @@ class Board:
     # ========================================================= #
 
 
-    
+
     # ==================== DRAWING FUNCTION =================== #
     def draw(self, screen, blinkAvailableCells = True):
         '''
@@ -523,7 +523,7 @@ class Board:
         screen.blit(text, text_rect)
     # ========================================================= #
 
-    
+
 
     # ======================= INTERFACES ====================== #
     def getActionFromClick(self, px, py):
@@ -536,7 +536,7 @@ class Board:
         if (ixLarge >= 3) or (iyLarge >= 3) or (ixSmall >= 3) or (iySmall >= 3): # Out of bounds
             return -1
         return 27*ixLarge + 9*iyLarge + 3*ixSmall + iySmall
-        
+
     def click(self, px, py):
         '''
         Interface for the player. Plays a move where the mouse was clicked

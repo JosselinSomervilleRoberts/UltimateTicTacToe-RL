@@ -72,7 +72,7 @@ class DQNetwork(torch.nn.Module):
 
 class DQNAgent(Agent):
 
-    def __init__(self, player = 1, env = gym.make('LunarLander-v2')):
+    def __init__(self, player = 1, env = gym.make('LunarLander-v2'), loading=True):
 
         learning_rate=0.001
         gamma=0.99
@@ -82,7 +82,7 @@ class DQNAgent(Agent):
         mem_size = 1000000
         min_memory_for_training=1000
         epsilon=1
-        epsilon_dec=0.995
+        epsilon_dec=0.998
         epsilon_min = 0.02
         frozen_iterations=6
 
@@ -102,14 +102,17 @@ class DQNAgent(Agent):
         self.q = DQNetwork(state_len, n_actions, learning_rate)
         self.replay_buffer = ReplayBuffer(self.state_len, mem_size)
 
-        self.learnNN(env)
+        if loading :
+            self.q.load()
+        else :
+            self.learnNN(env)
 
     def getAction(self, env, observation):
         observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
         q= self.q.forward(observation)
         action = torch.argmax(q)
 
-
+        '''
         # checks for action validity
         valid_actions = env.valid_actions()
         observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
@@ -119,7 +122,7 @@ class DQNAgent(Agent):
         while not mask[int(action)] :
             q[int(action)] = -100000
             action = torch.argmax(q)
-
+        '''
         print("picked action : ",int(action)," reward : ",q[int(action)])
         return int(action)
 
@@ -177,13 +180,13 @@ class DQNAgent(Agent):
             done = 0
             while not done:               # while the episode is not over yet
                 action = self.pickActionMaybeRandom(env,state)           # let the agent act
-                #print("action chosen : (",action//9,",",action%9,")")
                 new_state,reward, done, info = env.step(action) # performing the action in the environment
+                print("action chosen : (",action//9,",",action%9,") with reward : ",reward)
                 #print("new state : \n",state.reshape((9,9)))
                 score+=reward                            #  the total score during this round
                 self.replay_buffer.store_transition(state, action, reward, new_state, done)   # store timestep for experiene replay
                 self.learn()                            # the agent learns after each timestep
                 state = new_state
-            print("Pourcentage du learning effectué : ",round(100*episode/float(n_episodes),2), " %",end="\r")
+            print("Pourcentage du learning effectué : ",round(100*episode/float(n_episodes),2), " %") #,end="\r")
         env.close()
         self.q.save()
