@@ -12,10 +12,10 @@ class UltimateTicTacToe:
         self.error = 0
         self.move = None
         self.action_space = gym.spaces.Discrete(81)
-        self.observation_space = gym.spaces.MultiDiscrete([3]*81)
+        self.observation_space = gym.spaces.MultiDiscrete([3]*81 + [3]*9 + [2]*9)
 
     def observe(self):
-        return self.board.grid.flatten()
+        return np.concatenate((self.board.grid.flatten(), self.board.largeGrid.flatten(), self.board.possible.flatten()))
 
     def is_done(self):
         return (self.board.state != 0)

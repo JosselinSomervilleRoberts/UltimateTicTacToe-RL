@@ -129,8 +129,9 @@ class DQAgent(object):
 
 ## main file
 
-env = gym.make('LunarLander-v2')
-n_hidden_episodes = 10
+from basic_env import UltimateTicTacToeEnv
+env = UltimateTicTacToeEnv()#gym.make('LunarLander-v2')
+n_hidden_episodes = 0
 
 n_episodes = 1000 #number of episodes/games, we let the agent playe
 #making an instance of the agent
