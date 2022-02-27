@@ -22,19 +22,21 @@ if __name__ == '__main__':
     obs = env.reset()
 
     done = False
-    while not(done):
+    game = True
+    while game:
 
-        # Ask the agent to choose an action
-        action = agent.getAction(env, obs)
+        if not(done):
+            # Ask the agent to choose an action
+            action = agent.getAction(env, obs)
 
-        # If the aciton is negative this means that the agent asks to close the game
-        if action < 0:
-            done = True
+            # If the aciton is negative this means that the agent asks to close the game
+            if action < 0:
+                done = True
 
-        # Otherwise, if the action is valid we play it in the env
-        elif action < 81:
-            obs, reward, done, info = env.step(action)
-            print("REWARD:", reward)
+            # Otherwise, if the action is valid we play it in the env
+            elif action < 81:
+                obs, reward, done, info = env.step(action)
+                print("REWARD:", reward)
 
         if display:
             # Render the environment
@@ -43,7 +45,7 @@ if __name__ == '__main__':
             # Check for pygame event (to close the window)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: # Quit cross
-                    done = True
+                    game = False
 
             # Delay to not spam
             pygame.time.delay(1)
