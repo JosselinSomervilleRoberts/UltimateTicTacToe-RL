@@ -31,6 +31,7 @@ class UltimateTicTacToe:
         self.error, self.move = self.board.play(ixLarge, iyLarge, ixSmall, iySmall)
 
     def evaluate(self):
+        if self.error > 0: return -100
         return self.board.reward
 
     def view(self, blink):
