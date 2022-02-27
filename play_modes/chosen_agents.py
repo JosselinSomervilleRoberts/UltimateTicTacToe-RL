@@ -16,7 +16,7 @@ from agents.agent_minimax_pruning import MinimaxPruningAgent
 from agents.agent_dqn import DQNAgent
 
 agent2 = RandomAgent(2) #, 6, True)
-agent1 = DQNAgent(1,SinglePlayerEnv(RandomAgent(2)))
+agent1 = DQNAgent(1,SinglePlayerEnv(RandomAgent(2)), False)
 display = True
 
 if __name__ == '__main__':

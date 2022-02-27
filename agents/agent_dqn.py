@@ -6,6 +6,7 @@ import torch
 from torch.optim import Adam
 from torch.nn import Linear, ReLU, Dropout, BatchNorm1d
 import os
+import tqdm
 
 ## agent
 
@@ -45,6 +46,7 @@ class DQNetwork(torch.nn.Module):
     def __init__(self, state_len, n_actions,learning_rate):
         super(DQNetwork, self).__init__()
         self.device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        print(self.device)
         self.learning_rate = learning_rate
         self.n_actions = n_actions
         self.network = torch.nn.Sequential(
@@ -107,45 +109,34 @@ class DQNAgent(Agent):
         else :
             self.learnNN(env)
 
-    def getAction(self, env, observation):
+    def getAction(self, env, observation, check_validity = True):
         observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
-        q= self.q.forward(observation)
-        action = torch.argmax(q)
+        q = self.q.forward(observation)
+        action = int(torch.argmax(q))
 
-        '''
-        # checks for action validity
-        valid_actions = env.valid_actions()
-        observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
-        q= self.q.forward(observation)
-        action = torch.argmax(q)
-        mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
-        while not mask[int(action)] :
-            q[int(action)] = -100000
-            action = torch.argmax(q)
-        '''
-        print("picked action : ",int(action)," reward : ",q[int(action)])
-        return int(action)
-
-    def pickActionMaybeRandom(self, env, observation):
-        valid_actions = env.valid_actions()
-        if np.random.random() < self.epsilon:
-            action = np.random.choice(valid_actions)
-        else:
-            observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
-            q= self.q.forward(observation)
-            action = torch.argmax(q)
-            '''
+        if check_validity:
             # checks for action validity
-            observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
-            q= self.q.forward(observation)
-            mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
-            # truc à faire avec quelque chose comme torch.argmax(torch.masked_select(q,torch.BoolTensor(mask))) pour éviter le while dégueu
-            action = torch.argmax(q)
-            while not mask[int(action)] :
-                q[int(action)] = -100000
-                action = torch.argmax(q)
-            '''
-        return int(action)
+            valid_actions = env.valid_actions()
+
+            if action in valid_actions:
+                pass
+            else:
+                q_min = torch.min(q)
+                q += q_min + 1
+                mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
+                q *= mask
+                action = int(torch.argmax(q))
+
+        # value = q[action]
+        # print("picked action : ",action," reward : ", value)
+        return action
+
+    def pickActionMaybeRandom(self, env, observation, check_validity = False):
+        if np.random.random() < self.epsilon:
+            valid_actions = env.valid_actions()
+            return int(np.random.choice(valid_actions))
+        else:
+            return self.getAction(env, observation, check_validity)
 
     def learn(self):
         if self.replay_buffer.mem_counter < self.min_memory_for_training:
@@ -172,21 +163,17 @@ class DQNAgent(Agent):
         return
 
     def learnNN(self,env):
-        n_hidden_episodes = 10
-        n_episodes = 100 #1000
-        for episode in range(n_episodes):
+        n_episodes = 500 #1000
+        for _ in tqdm.tqdm(range(n_episodes)):
             state = env.reset()           # resetting the environment after each episode
             score = 0
             done = 0
             while not done:               # while the episode is not over yet
                 action = self.pickActionMaybeRandom(env,state)           # let the agent act
                 new_state,reward, done, info = env.step(action) # performing the action in the environment
-                print("action chosen : (",action//9,",",action%9,") with reward : ",reward)
-                #print("new state : \n",state.reshape((9,9)))
                 score+=reward                            #  the total score during this round
                 self.replay_buffer.store_transition(state, action, reward, new_state, done)   # store timestep for experiene replay
                 self.learn()                            # the agent learns after each timestep
                 state = new_state
-            print("Pourcentage du learning effectué : ",round(100*episode/float(n_episodes),2), " %") #,end="\r")
         env.close()
         self.q.save()
