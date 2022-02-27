@@ -97,19 +97,28 @@ class DQNAgent(Agent):
         self.learnNN(env)
 
     def getAction(self, env, observation):
+        valid_actions = env.valid_actions()
+        observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
+        q= self.q.forward(observation)
+        #action = torch.argmax(q)
+        mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
+        rewards = np.ravel(np.array(q))
+        action = np.argmax(rewards[mask])
+        return int(action)
+
+    def pickActionMaybeRandom(self, env, observation):
+        valid_actions = env.valid_actions()
         if np.random.random() < self.epsilon:
-            action = np.random.choice(np.arange(self.n_actions))
+            action = np.random.choice(valid_actions)
         else:
-            observation = torch.tensor([observation], dtype = torch.float32).to(self.q.device)
+            observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
             q= self.q.forward(observation)
+            mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
+            # truc à faire avec quelque chose comme torch.argmax(torch.masked_select(q,torch.BoolTensor(mask))) pour éviter le while dégueu
             action = torch.argmax(q)
-            print(q,action,env.action_space)
-            while not (action in env.action_space) :
-                q[0,int(action)] = -100000
+            while not mask[int(action)] :
+                q[int(action)] = -100000
                 action = torch.argmax(q)
-                if q[0,int(action)]==-100000 :
-                    return -1
-                print("new action : ",action,q)
         return int(action)
 
     def learn(self):
@@ -144,14 +153,13 @@ class DQNAgent(Agent):
             score = 0
             done = 0
             while not done:               # while the episode is not over yet
-                print("new move")
-                #if episode > n_hidden_episodes:
-                #    env.render()               # displaying what the agent does
-                action = self.getAction(env,state)           # let the agent act
+                action = self.pickActionMaybeRandom(env,state)           # let the agent act
+                #print("action chosen : (",action//9,",",action%9,")")
                 new_state,reward, done, info = env.step(action) # performing the action in the environment
+                #print("new state : \n",state.reshape((9,9)))
                 score+=reward                            #  the total score during this round
                 self.replay_buffer.store_transition(state, action, reward, new_state, done)   # store timestep for experiene replay
                 self.learn()                            # the agent learns after each timestep
                 state = new_state
-            print("Pourcentage du learning effectué : ",round(100*episode/float(n_episodes),2), " %") # end="\r")
+            print("Pourcentage du learning effectué : ",round(100*episode/float(n_episodes),2), " %",end="\r")
         env.close()
