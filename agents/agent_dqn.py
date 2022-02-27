@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch.optim import Adam
 from torch.nn import Linear, ReLU, Dropout, BatchNorm1d
+import os
 
 ## agent
 
@@ -61,6 +62,13 @@ class DQNetwork(torch.nn.Module):
     def forward(self,state):
         return self.network(state)
 
+    def save(self):
+        torch.save(self,os.path.dirname(__file__)+"/DQNetwork.pt")
+
+    def load(self):
+        self = torch.load(os.path.dirname(__file__)+"/DQNetwork.pt")
+        self.eval()
+
 
 class DQNAgent(Agent):
 
@@ -97,15 +105,22 @@ class DQNAgent(Agent):
         self.learnNN(env)
 
     def getAction(self, env, observation):
+        observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
+        q= self.q.forward(observation)
+        action = torch.argmax(q)
+
+
+        # checks for action validity
         valid_actions = env.valid_actions()
         observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
         q= self.q.forward(observation)
         action = torch.argmax(q)
         mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
-        action = torch.argmax(q)
         while not mask[int(action)] :
             q[int(action)] = -100000
             action = torch.argmax(q)
+
+        print("picked action : ",int(action)," reward : ",q[int(action)])
         return int(action)
 
     def pickActionMaybeRandom(self, env, observation):
@@ -115,12 +130,18 @@ class DQNAgent(Agent):
         else:
             observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
             q= self.q.forward(observation)
+            action = torch.argmax(q)
+            '''
+            # checks for action validity
+            observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
+            q= self.q.forward(observation)
             mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
             # truc à faire avec quelque chose comme torch.argmax(torch.masked_select(q,torch.BoolTensor(mask))) pour éviter le while dégueu
             action = torch.argmax(q)
             while not mask[int(action)] :
                 q[int(action)] = -100000
                 action = torch.argmax(q)
+            '''
         return int(action)
 
     def learn(self):
@@ -165,3 +186,4 @@ class DQNAgent(Agent):
                 state = new_state
             print("Pourcentage du learning effectué : ",round(100*episode/float(n_episodes),2), " %",end="\r")
         env.close()
+        self.q.save()

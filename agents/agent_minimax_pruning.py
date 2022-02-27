@@ -60,4 +60,3 @@ class MinimaxPruningAgent(Agent):
         print("Expected reward:", expected_reward)
         return action
 
-    
