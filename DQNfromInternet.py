@@ -5,6 +5,15 @@ import torch
 from torch.optim import Adam
 from torch.nn import Linear, ReLU, Dropout, BatchNorm1d
 
+## added by Marie to fix import issues
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+install("gym[svpino]")
+
 ## agent
 
 class ReplayBuffer(object):
@@ -89,7 +98,7 @@ class DQAgent(object):
         if np.random.random() < self.epsilon:
             action = np.random.choice(np.arange(self.n_actions))
         else:
-            state = torch.tensor([state], dtype = torch.float32).to(self.q.device)
+            state = torch.tensor(np.array(state), dtype = torch.float32).to(self.q.device)
             q= self.q.forward(state)
             action = torch.argmax(q)
         return int(action)

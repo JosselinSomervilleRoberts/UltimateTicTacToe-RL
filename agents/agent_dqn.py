@@ -103,6 +103,13 @@ class DQNAgent(Agent):
             observation = torch.tensor([observation], dtype = torch.float32).to(self.q.device)
             q= self.q.forward(observation)
             action = torch.argmax(q)
+            print(q,action,env.action_space)
+            while not (action in env.action_space) :
+                q[0,int(action)] = -100000
+                action = torch.argmax(q)
+                if q[0,int(action)]==-100000 :
+                    return -1
+                print("new action : ",action,q)
         return int(action)
 
     def learn(self):
@@ -137,13 +144,14 @@ class DQNAgent(Agent):
             score = 0
             done = 0
             while not done:               # while the episode is not over yet
+                print("new move")
                 #if episode > n_hidden_episodes:
                 #    env.render()               # displaying what the agent does
-                action = agent.choose_action(state)           # let the agent act
+                action = self.getAction(env,state)           # let the agent act
                 new_state,reward, done, info = env.step(action) # performing the action in the environment
                 score+=reward                            #  the total score during this round
-                agent.store_transition(state, action, reward, new_state, done)   # store timestep for experiene replay
-                agent.learn()                            # the agent learns after each timestep
+                self.replay_buffer.store_transition(state, action, reward, new_state, done)   # store timestep for experiene replay
+                self.learn()                            # the agent learns after each timestep
                 state = new_state
-            print("Pourcentage du learning effectué : ",round(100*episode/float(n_episodes),2), " %", end="\r")
+            print("Pourcentage du learning effectué : ",round(100*episode/float(n_episodes),2), " %") # end="\r")
         env.close()
