@@ -1,4 +1,4 @@
-from basic_env import UltimateTicTacToeEnv
+from envs.env_two_player import TwoPlayerEnv
 import pygame
 
 
@@ -30,7 +30,7 @@ def minimax(env, cumulated_reward = 0, step = 0, maximize = True):
 
 
 if __name__ == '__main__':
-    env = UltimateTicTacToeEnv()
+    env = TwoPlayerEnv()
     obs = env.reset()
 
     game = True

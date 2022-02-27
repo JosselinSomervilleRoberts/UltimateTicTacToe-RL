@@ -13,11 +13,11 @@ from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
 
-agent = PlayerAgent(1)
+agent = MinimaxPruningAgent(1, 5, True)
 display = True
 
 if __name__ == '__main__':
-    agent2 = MinimaxPruningAgent(2, 6, True)
+    agent2 = MinimaxPruningAgent(2, 5, True)
     env = SinglePlayerEnv(agent2)
     obs = env.reset()
 

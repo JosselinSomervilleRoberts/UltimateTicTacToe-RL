@@ -5,7 +5,7 @@ import sys
 sys.path.append("C:\\Users\\Marie\\Organisation_Marie\\X\\3A\\INF 581 - Advanced machine learning\\Project\\UltimateTicTacToe-RL")
 '''
 
-from basic_env import UltimateTicTacToeEnv
+from envs.env_two_player import TwoPlayerEnv
 import pygame
 
 from agents.agent_player import PlayerAgent
@@ -18,7 +18,7 @@ agent1 = RandomAgent(1)
 display = True
 
 if __name__ == '__main__':
-    env = UltimateTicTacToeEnv()
+    env = TwoPlayerEnv()
     obs = env.reset()
 
     done = False
@@ -37,7 +37,7 @@ if __name__ == '__main__':
         # Otherwise, if the action is valid we play it in the env
         elif action < 81:
             obs, reward, done, info = env.step(action)
-            print("REWARD:", reward)
+            #print("REWARD =", reward)
 
         if display:
             # Render the environment

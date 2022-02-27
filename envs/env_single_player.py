@@ -2,10 +2,9 @@ from envs.env_two_player import TwoPlayerEnv
 
 class SinglePlayerEnv(TwoPlayerEnv):
 
-    def __init__(self, agent2, randomOrder=False):
+    def __init__(self, agent2):
         super().__init__()
         self.agent2 = agent2
-        self.randomOrder = randomOrder
 
     def reset(self):
         self.last_obs = super().reset()
@@ -15,9 +14,10 @@ class SinglePlayerEnv(TwoPlayerEnv):
     def step(self, action):
         self.pygame.do_action(action)
         reward = self.pygame.evaluate()
+        self.last_done = self.pygame.is_done()
 
-        if self.pygame.error > 0: # There is an error, the move could not be played
-            return self.last_obs, reward, self.last_done, {}
+        if self.pygame.error > 0 or self.last_done: # There is an error, the move could not be played or the game has ended
+            self.last_reward = reward
         else: # The move was played so we make the opponent play
             player_opponent = self.pygame.board.currentPlayer
             obs = self.pygame.observe()
@@ -32,4 +32,6 @@ class SinglePlayerEnv(TwoPlayerEnv):
             self.last_done = self.pygame.is_done()
 
             # Here we return as the reward the reward of the agent move - the reward of his opponent for his move
-            return self.last_obs, reward + reward2, self.last_done, {}
+            self.last_reward = reward + reward2
+
+        return self.last_obs, self.last_reward, self.last_done, {}

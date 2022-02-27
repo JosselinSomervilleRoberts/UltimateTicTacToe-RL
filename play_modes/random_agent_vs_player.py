@@ -1,9 +1,9 @@
-from basic_env import UltimateTicTacToeEnv
+from envs.env_two_player import TwoPlayerEnv
 import pygame
 
 
 if __name__ == '__main__':
-    env = UltimateTicTacToeEnv()
+    env = TwoPlayerEnv()
     obs = env.reset()
 
     game = True
