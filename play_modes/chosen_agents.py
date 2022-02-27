@@ -1,3 +1,10 @@
+
+'''
+# necessary for Marie
+import sys
+sys.path.append("C:\\Users\\Marie\\Organisation_Marie\\X\\3A\\INF 581 - Advanced machine learning\\Project\\UltimateTicTacToe-RL")
+'''
+
 from basic_env import UltimateTicTacToeEnv
 import pygame
 
@@ -19,7 +26,7 @@ if __name__ == '__main__':
 
         # Get the agent whose turn it is
         agent = agent1 if (env.pygame.board.currentPlayer == 1) else agent2
-        
+
         # Ask the agent to choose an action
         action = agent.getAction(env, obs)
 
@@ -43,7 +50,7 @@ if __name__ == '__main__':
 
             # Delay to not spam
             pygame.time.delay(1)
-        
+
     pygame.quit()
     print("ENV state:", env.pygame.board.state)
     env.close()
