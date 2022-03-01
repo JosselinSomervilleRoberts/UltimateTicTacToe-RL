@@ -4,6 +4,11 @@
 import sys
 sys.path.append("C:\\Users\\Marie\\Organisation_Marie\\X\\3A\\INF 581 - Advanced machine learning\\Project\\UltimateTicTacToe-RL")
 '''
+"""
+# for Astrid
+import sys
+sys.path.append("/home/astrid/Documents/X/3A/P2/INF581 - Machine Learning and Autonomous Agents/project/UltimateTicTacToe-RL/")
+"""
 
 from envs.env_single_player import SinglePlayerEnv
 import pygame
@@ -12,12 +17,15 @@ from agents.agent_player import PlayerAgent
 from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
+from agents.agent_mcts import MCTSAgent
 
-agent = MinimaxPruningAgent(1, 5, True)
+#agent = MinimaxPruningAgent(1, 5, True)
+agent = MCTSAgent(1, 1000)
 display = True
 
 if __name__ == '__main__':
-    agent2 = MinimaxPruningAgent(2, 5, True)
+    #agent2 = MinimaxPruningAgent(2, 5, True)
+    agent2 = PlayerAgent(2)
     env = SinglePlayerEnv(agent2)
     obs = env.reset()
 
