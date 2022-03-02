@@ -92,5 +92,5 @@ class MCTSAgent(Agent):
         #action = env.action_space.sample()
         #TODO: find good value for nb_iter
         action = UCT(env, 3 - self.player, self.nb_iter)
-        print("MCTS chose an action!")
+        #print("MCTS chose an action!")
         return action

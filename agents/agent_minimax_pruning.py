@@ -57,6 +57,6 @@ class MinimaxPruningAgent(Agent):
 
     def getAction(self, env, observation):
         action, expected_reward = minimaxPruning(env, self.stepMax, maximize=(self.player == 1), rand=self.rand)
-        print("Expected reward:", expected_reward)
+        #print("Expected reward:", expected_reward)
         return action
 
