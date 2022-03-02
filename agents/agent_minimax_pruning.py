@@ -17,17 +17,18 @@ def minimaxPruning(env, depth, alpha = - INFINITY, beta = INFINITY, cumulated_re
         for action in actions:
             reward, done = env.fast_step(action)
             move = env.getLastMove()
-            _, eval = minimaxPruning(env, newDepth, alpha, beta, cumulated_reward + reward, done, False, rand)
+            _, eval = minimaxPruning(env, newDepth, alpha, beta, cumulated_reward + reward, done, False, rand = False)
             if eval > maxEval:
                 maxEval = eval
-                maxAction = [action]
-            elif eval == maxEval:
+                if rand: maxAction = [action]
+                else: maxAction = action
+            elif rand and eval == maxEval:
                 maxAction.append(action)
-            alpha = max(alpha, eval)
             env.undoMove(move)
+            alpha = max(alpha, eval)
             if beta <= alpha: break
         if rand: return random.choice(maxAction), maxEval
-        else: return maxAction[0], maxEval
+        else: return maxAction, maxEval
 
     else:
         minEval = + INFINITY
@@ -35,17 +36,18 @@ def minimaxPruning(env, depth, alpha = - INFINITY, beta = INFINITY, cumulated_re
         for action in actions:
             reward, done = env.fast_step(action)
             move = env.getLastMove()
-            _, eval = minimaxPruning(env, newDepth, alpha, beta, cumulated_reward + reward, done, True, rand)
+            _, eval = minimaxPruning(env, newDepth, alpha, beta, cumulated_reward + reward, done, True, rand = False)
             if eval < minEval:
                 minEval = eval
-                minAction = [action]
-            elif eval == minEval:
+                if rand: minAction = [action]
+                else: minAction = action
+            elif rand and eval == minEval:
                 minAction.append(action)
-            beta = min(beta, eval)
             env.undoMove(move)
+            beta = min(beta, eval)
             if beta <= alpha: break
         if rand: return random.choice(minAction), minEval
-        else: return minAction[0], minEval
+        else: return minAction, minEval
 
 
 class MinimaxPruningAgent(Agent):

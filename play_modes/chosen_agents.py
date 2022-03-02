@@ -15,12 +15,15 @@ from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
 from agents.agent_dqn import DQNAgent
 
-agent2 = RandomAgent(2) #, 6, True)
-agent1 = DQNAgent(1,SinglePlayerEnv(RandomAgent(2)), False)
+agent2 = RandomAgent(2)#MinimaxPruningAgent(2, 3, True)
+env = SinglePlayerEnv(agent2)
+
+agent = DQNAgent(1, env, True, "_overnight_final")
+#agent.learnNN(env, False, 10000, 500, "_overnight")
 display = True
 
+
 if __name__ == '__main__':
-    env = TwoPlayerEnv()
     obs = env.reset()
 
     done = False
@@ -28,9 +31,6 @@ if __name__ == '__main__':
     while game:
 
         if not(done):
-            # Get the agent whose turn it is
-            agent = agent1 if (env.pygame.board.currentPlayer == 1) else agent2
-
             # Ask the agent to choose an action
             action = agent.getAction(env, obs)
 
@@ -41,7 +41,7 @@ if __name__ == '__main__':
             # Otherwise, if the action is valid we play it in the env
             elif action < 81:
                 obs, reward, done, info = env.step(action)
-                #print("REWARD =", reward)
+                print("REWARD:", reward)
 
         if display:
             # Render the environment

@@ -34,4 +34,4 @@ class SinglePlayerEnv(TwoPlayerEnv):
             # Here we return as the reward the reward of the agent move - the reward of his opponent for his move
             self.last_reward = reward + reward2
 
-        return self.last_obs, self.last_reward, self.last_done, {}
+        return self.last_obs, self.last_reward, self.last_done, self.pygame.error
