@@ -292,7 +292,43 @@ class Board:
         # Everything went fine
         return 0, move
 
-    def checkWinLargeCell(self, ix, iy, move):
+    def play_ultra_fast(self, ixLarge, iyLarge, ixSmall, iySmall): #play but do not update reward
+        '''
+        Attempts to play for the current player in the given cell
+        Input: ixLarge, iyLarge, ixSmall, iySmall (indexes of the small cell)
+        Output: Error number
+            - 0: everything went fine
+            - 1: the game is not running (not initiated or already won)
+            - 2: the player cannot play in the desired large cell
+            - 3: the desired small cell is not available (already occupied)
+        Move played (to reverse)
+        '''
+        if self.state != 0:
+            return 1, None # Move not aload since the game is already finished
+        if not(self.possible[ixLarge,iyLarge]):
+            return 2, None # Move not aload since not in the correct large cell
+        elif self.grid[ixLarge,iyLarge,ixSmall,iySmall] != 0:
+            return 3, None # Move not aload since the small cell is already occupied
+
+        self.reward_reset()
+
+        # Play
+        self.grid[ixLarge,iyLarge,ixSmall,iySmall] = self.currentPlayer
+        #move = [self.possible.copy(), (ixLarge,iyLarge,ixSmall,iySmall)]
+
+        # Check if a cell or the game is won
+        self.checkWinLargeCell(ixLarge, iyLarge, None, True)
+
+        # Update possibilities
+        self.updatePossible(ixSmall, iySmall)
+
+        # Update player
+        self.currentPlayer = 3 - self.currentPlayer # Swap player
+
+        # Everything went fine
+        return 0
+
+    def checkWinLargeCell(self, ix, iy, move, fast = False):
         '''
         Checks if a player won the large cell queried. If so, it also checks if the player globally won the game
         Input: ix, iy (indexes of the large cell)
@@ -302,20 +338,24 @@ class Board:
         if res != 0:
             # Win lage cell
             self.largeGrid[ix,iy] = res
-            self.reward_update_winning_large_cell(ix, iy)
-            move.append((ix, iy))
+            
+            if not(fast):
+                self.reward_update_winning_large_cell(ix, iy)
+                move.append((ix, iy))
 
             # Check if the game was won
             resWin = Board.checkWinBoard(self.largeGrid)
             if resWin != 0: # A player won
                 self.state = resWin
-                self.reward_update_winning()
 
-                # Display winning message
-                self.textColor = Board.COLOR_PLAYER_2
-                if resWin == 1:
-                    self.textColor = Board.COLOR_PLAYER_1
-                self.text = "Player " + str(self.state) + " won !"
+                if not(fast):
+                    self.reward_update_winning()
+
+                    # Display winning message
+                    self.textColor = Board.COLOR_PLAYER_2
+                    if resWin == 1:
+                        self.textColor = Board.COLOR_PLAYER_1
+                    self.text = "Player " + str(self.state) + " won !"
 
     def updatePossible(self, ix, iy):
         '''
