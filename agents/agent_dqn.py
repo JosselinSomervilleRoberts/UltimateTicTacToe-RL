@@ -1,3 +1,4 @@
+from html.entities import name2codepoint
 from agents.agent import Agent
 
 import gym
@@ -64,17 +65,17 @@ class DQNetwork(torch.nn.Module):
     def forward(self,state):
         return self.network(state)
 
-    def save(self):
-        torch.save(self,os.path.dirname(__file__)+"/DQNetwork.pt")
+    def save(self, name = ""):
+        torch.save(self,os.path.dirname(__file__)+"/DQNetwork" + name + ".pt")
 
-    def load(self):
-        self = torch.load(os.path.dirname(__file__)+"/DQNetwork.pt")
+    def load(self, name = ""):
+        self = torch.load(os.path.dirname(__file__)+"/DQNetwork" + name + ".pt")
         self.eval()
 
 
 class DQNAgent(Agent):
 
-    def __init__(self, player = 1, env = gym.make('LunarLander-v2'), loading=True):
+    def __init__(self, player = 1, env = gym.make('LunarLander-v2'), loading=True, name = ""):
 
         learning_rate=0.001
         gamma=0.99
@@ -85,7 +86,7 @@ class DQNAgent(Agent):
         min_memory_for_training=1000
         epsilon=1
         epsilon_dec=0.998
-        epsilon_min = 0.02
+        epsilon_min = 0.2
         frozen_iterations=6
 
 
@@ -105,7 +106,7 @@ class DQNAgent(Agent):
         self.replay_buffer = ReplayBuffer(self.state_len, mem_size)
 
         if loading :
-            self.q.load()
+            self.q.load(name)
         else :
             self.learnNN(env)
 
@@ -121,11 +122,10 @@ class DQNAgent(Agent):
             if action in valid_actions:
                 pass
             else:
-                q_min = torch.min(q)
-                q += q_min + 1
+                q_min = float(torch.min(q))
                 mask = np.array([True if i in valid_actions else False for i in range(env.action_space.n)])
-                q *= mask
-                action = int(torch.argmax(q))
+                new_q = (q.detach().numpy() - q_min + 1.) *  mask
+                action = int(np.argmax(new_q))
 
         # value = q[action]
         # print("picked action : ",action," reward : ", value)
@@ -138,7 +138,13 @@ class DQNAgent(Agent):
         else:
             return self.getAction(env, observation, check_validity)
 
-    def learn(self):
+    def pickActionMaybeMasked(self, env, observation):
+        if np.random.random() < self.epsilon:
+            return self.getAction(env, observation, True)
+        else:
+            return self.getAction(env, observation, False)
+
+    def learn(self, error):
         if self.replay_buffer.mem_counter < self.min_memory_for_training:
             return
         states, actions, rewards, new_states, dones = self.replay_buffer.sample_memory(self.batch_size)
@@ -157,23 +163,52 @@ class DQNAgent(Agent):
         self.q.optimizer.step()  # Backpropagate error
 
         # decrease epsilon:
-        self.epsilon = self.epsilon * self.epsilon_dec if self.epsilon *self.epsilon_dec \
-                                                          > self.epsilon_min else self.epsilon_min
+        if error == 0:
+            if self.epsilon * self.epsilon_dec > self.epsilon_min:
+                self.epsilon *= self.epsilon_dec
+        else:
+            if self.epsilon / self.epsilon_dec <= 1:
+                self.epsilon /= self.epsilon_dec
+
         self.it_counter += 1
         return
 
-    def learnNN(self,env):
-        n_episodes = 500 #1000
-        for _ in tqdm.tqdm(range(n_episodes)):
+    def learnNN(self, env, masked = False, n_episodes = 100, n_save = 1000, trainingName = ""):
+        l_epsilon = []
+        l_win = []
+        sum_win = 0
+
+        for episode in tqdm.tqdm(range(n_episodes)):
             state = env.reset()           # resetting the environment after each episode
             score = 0
             done = 0
             while not done:               # while the episode is not over yet
-                action = self.pickActionMaybeRandom(env,state)           # let the agent act
-                new_state,reward, done, info = env.step(action) # performing the action in the environment
-                score+=reward                            #  the total score during this round
+                action = None
+                if masked:
+                    action = self.getAction(env, state, True)
+                else:
+                    action = self.pickActionMaybeMasked(env,state)           # let the agent act
+                new_state,reward, done, error = env.step(action) # performing the action in the environment
+                score += reward                            #  the total score during this round
                 self.replay_buffer.store_transition(state, action, reward, new_state, done)   # store timestep for experiene replay
-                self.learn()                            # the agent learns after each timestep
+                self.learn(error)                            # the agent learns after each timestep
                 state = new_state
+
+            if env.pygame.board.state == 1:
+                sum_win +=1
+            elif env.pygame.board.state == 2:
+                sum_win -= 1
+            elif env.pygame.board.state == 3:
+                sum_win += 0
+
+            l_epsilon.append(self.epsilon)
+            l_win.append(sum_win)
+
+            if (episode+1) % n_save == 0:
+                self.q.save(trainingName + "_" + str(episode+1))
+
         env.close()
-        self.q.save()
+        self.q.save(trainingName + "_final")
+        print(l_epsilon)
+        print("\n")
+        print(l_win)
