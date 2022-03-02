@@ -30,39 +30,38 @@ class Board:
 
 
     # =============== HELPER FUNCTIONS ON GRIDS =============== #
-    def checkWinBoard(grid):
+    def checkWinBoard(grid, start=0):
         '''
         Checks if a given grid has a winner (int tic tac toe)
         Input: grid (3 x 3)
         Output: True if a line of plays exists (classic tic tac toe)
         '''
         for i in range(3):
-            if grid[i,0] == grid[i,1] == grid[i,2] != 0:
-                return grid[i,0]
-            if grid[0,i] == grid[1,i] == grid[2,i] != 0:
-                return grid[0,i]
+            if grid[start + 3*i+0] == grid[start + 3*i+1] == grid[start + 3*i+2] != 0:
+                return grid[start + 3*i+0]
+            if grid[start + 3*0+i] == grid[start + 3*1+i] == grid[start + 3*2+i] != 0:
+                return grid[start + 3*0+i]
 
         # Diagonals
-        if grid[0,0] == grid[1,1] == grid[2,2] != 0:
-            return grid[0,0]
-        if grid[0,2] == grid[1,1] == grid[2,0] != 0:
-            return grid[0,2]
+        if grid[start] == grid[start + 4] == grid[start + 8] != 0:
+            return grid[start]
+        if grid[start + 2] == grid[start + 4] == grid[start + 6] != 0:
+            return grid[start + 2]
 
         return 0
 
-    def gridIsFull(grid):
+    def gridIsFull(grid, start=0):
         '''
         Checks if a given grid is full
         Input: grid (3 x 3)
         Output: False if at least one cell is equal to 0, True otherwise
         '''
-        for ix in range(3):
-            for iy in range(3):
-                if grid[ix,iy] == 0:
-                    return False
+        for i in range(9):
+            if grid[start + i] == 0:
+                return False
         return True
 
-    def gridValue(grid):
+    def gridValue(grid, start=0):
         value = 0
 
         if True:
@@ -77,9 +76,10 @@ class Board:
                 zero = None
                 addToUsed = False
                 for j in range(3):
-                    if grid[i,j] == 1: nb1 += 1
-                    elif grid[i,j] == 2: nb2 += 1
-                    else: zero = (i,j)
+                    index = start +3*i +j
+                    if grid[index] == 1: nb1 += 1
+                    elif grid[index] == 2: nb2 += 1
+                    else: zero = index
                 if nb1 == 2 and nb2 == 0:
                     lines1.add(zero)
                     addToUsed = True
@@ -88,7 +88,7 @@ class Board:
                     addToUsed = True
                 if addToUsed:
                     for j in range(3):
-                        used.add((i,j))
+                        used.add(start +3*i +j)
 
             # Lignes verticales
             for j in range(3):
@@ -97,9 +97,10 @@ class Board:
                 zero = None
                 addToUsed = False
                 for i in range(3):
-                    if grid[i,j] == 1: nb1 += 1
-                    elif grid[i,j] == 2: nb2 += 1
-                    else: zero = (i,j)
+                    index = start +3*i +j
+                    if grid[index] == 1: nb1 += 1
+                    elif grid[index] == 2: nb2 += 1
+                    else: zero = index
                 if nb1 == 2 and nb2 == 0:
                     lines1.add(zero)
                     addToUsed = True
@@ -108,7 +109,7 @@ class Board:
                     addToUsed = True
                 if addToUsed:
                     for i in range(3):
-                        used.add((i,j))
+                        used.add(start +3*i +j)
 
             # Diagonale 1
             nb1 = 0
@@ -116,9 +117,10 @@ class Board:
             zero = None
             addToUsed = False
             for i in range(3):
-                if grid[i,i] == 1: nb1 += 1
-                elif grid[i,i] == 2: nb2 += 1
-                else: zero = (i,i)
+                index = start +3*i +i
+                if grid[index] == 1: nb1 += 1
+                elif grid[index] == 2: nb2 += 1
+                else: zero = index
             if nb1 == 2 and nb2 == 0:
                 lines1.add(zero)
                 addToUsed = True
@@ -127,7 +129,7 @@ class Board:
                 addToUsed = True
             if addToUsed:
                 for i in range(3):
-                    used.add((i,i))
+                    used.add(start +3*i +i)
 
             # Diagonale 2
             nb1 = 0
@@ -135,9 +137,10 @@ class Board:
             zero = None
             addToUsed = False
             for i in range(3):
-                if grid[2-i,i] == 1: nb1 += 1
-                elif grid[2-i,i] == 2: nb2 += 1
-                else: zero = (2-i,i)
+                index = start +3*(2-i) +i
+                if grid[index] == 1: nb1 += 1
+                elif grid[index] == 2: nb2 += 1
+                else: zero = index
             if nb1 == 2 and nb2 == 0:
                 lines1.add(zero)
                 addToUsed = True
@@ -146,20 +149,21 @@ class Board:
                 addToUsed = True
             if addToUsed:
                 for i in range(3):
-                    used.add((2-i,i))
+                    used.add(start +3*(2-i) +i)
 
             value += 5 * min(2, len(lines1))
             value -= 5 * min(2, len(lines2))
 
             for i in range(3):
                 for j in range(3):
-                    if grid[i,j] != 0 and not((i,j) in used):
+                    index = start + 3*i + j
+                    if grid[index] != 0 and not(index in used):
                         val = 1 # edge
                         if i == j == 1: # Middle
                             val = 2
                         elif (i != 1) and (j != 1): # Corner
                             val = 1.5
-                        value += val * (3-2*grid[i,j])
+                        value += val * (3-2*grid[index])
 
             return value
     # ========================================================= #
@@ -222,6 +226,15 @@ class Board:
 
 
 
+    # ==================== Grid Accessors ===================== #
+    def getLargeIndex(ix, iy):
+        return 3*ix + iy
+
+    def getIndex(ixLarge, iyLarge, ixSmall, iySmall):
+        return 27 * ixLarge + 9* iyLarge + 3*ixSmall + iySmall
+    # ========================================================= #
+
+
      # ==================== INITIALIZATION ==================== #
     def __init__(self):
         '''Constructor (automatically reset on construct)'''
@@ -237,12 +250,12 @@ class Board:
         self.text = "Player 1 plays"
         self.textColor = Board.COLOR_PLAYER_1
         self.state = 0
-        self.possible = np.array([[True for _ in range(3)] for _ in range(3)])
+        self.possible = [i for i in range(9)]
 
     def resetGrid(self):
         '''Builds empty grids (large and normal)'''
-        self.grid = np.zeros((3,3,3,3), dtype=int)
-        self.largeGrid = np.zeros((3,3), dtype=int)
+        self.grid = [0] * 81
+        self.largeGrid = [0] * 9
     # ========================================================= #
 
 
@@ -259,22 +272,24 @@ class Board:
             - 3: the desired small cell is not available (already occupied)
         Move played (to reverse)
         '''
+        large_index = Board.getLargeIndex(ixLarge, iyLarge)
+        grid_index = Board.getIndex(ixLarge,iyLarge,ixSmall,iySmall)
         if self.state != 0:
             return 1, None # Move not aload since the game is already finished
-        if not(self.possible[ixLarge,iyLarge]):
+        if not(large_index in self.possible):
             return 2, None # Move not aload since not in the correct large cell
-        elif self.grid[ixLarge,iyLarge,ixSmall,iySmall] != 0:
+        elif self.grid[grid_index] != 0:
             return 3, None # Move not aload since the small cell is already occupied
 
         self.reward_reset()
 
         # Play
-        self.grid[ixLarge,iyLarge,ixSmall,iySmall] = self.currentPlayer
-        move = [self.possible.copy(), (ixLarge,iyLarge,ixSmall,iySmall)]
-        self.reward_update_playing_on(ixLarge, iyLarge, ixSmall, iySmall)
+        self.grid[grid_index] = self.currentPlayer
+        move = [self.possible.copy(), grid_index]
+        self.reward_update_playing_on(large_index, grid_index)
 
         # Check if a cell or the game is won
-        self.checkWinLargeCell(ixLarge, iyLarge, move)
+        self.checkWinLargeCell(large_index, move)
 
         # Update possibilities
         self.updatePossible(ixSmall, iySmall)
@@ -303,21 +318,22 @@ class Board:
             - 3: the desired small cell is not available (already occupied)
         Move played (to reverse)
         '''
+        large_index = Board.getLargeIndex(ixLarge, iyLarge)
+        grid_index = Board.getIndex(ixLarge,iyLarge,ixSmall,iySmall)
         if self.state != 0:
             return 1, None # Move not aload since the game is already finished
-        if not(self.possible[ixLarge,iyLarge]):
+        if not(large_index in self.possible):
             return 2, None # Move not aload since not in the correct large cell
-        elif self.grid[ixLarge,iyLarge,ixSmall,iySmall] != 0:
+        elif self.grid[grid_index] != 0:
             return 3, None # Move not aload since the small cell is already occupied
 
         self.reward_reset()
 
         # Play
-        self.grid[ixLarge,iyLarge,ixSmall,iySmall] = self.currentPlayer
-        #move = [self.possible.copy(), (ixLarge,iyLarge,ixSmall,iySmall)]
+        self.grid[grid_index] = self.currentPlayer
 
         # Check if a cell or the game is won
-        self.checkWinLargeCell(ixLarge, iyLarge, None, True)
+        self.checkWinLargeCell(large_index, None, True)
 
         # Update possibilities
         self.updatePossible(ixSmall, iySmall)
@@ -328,20 +344,19 @@ class Board:
         # Everything went fine
         return 0
 
-    def checkWinLargeCell(self, ix, iy, move, fast = False):
+    def checkWinLargeCell(self, large_index, move, fast = False):
         '''
         Checks if a player won the large cell queried. If so, it also checks if the player globally won the game
         Input: ix, iy (indexes of the large cell)
         NO OUTPUT -> Automatically updates self.largeGrid and self.state'''
-        g = self.grid[ix,iy]
-        res = Board.checkWinBoard(g)
+        res = Board.checkWinBoard(self.grid, 9*large_index)
         if res != 0:
             # Win lage cell
-            self.largeGrid[ix,iy] = res
+            self.largeGrid[large_index] = res
             
             if not(fast):
-                self.reward_update_winning_large_cell(ix, iy)
-                move.append((ix, iy))
+                self.reward_update_winning_large_cell(large_index)
+                move.append(large_index)
 
             # Check if the game was won
             resWin = Board.checkWinBoard(self.largeGrid)
@@ -363,13 +378,13 @@ class Board:
         Input:  ix, iy (indexes of the large cell just played)
         NO OUTPUT -> Automatically updates self.possible
         '''
-        if self.largeGrid[ix,iy] != 0: # If the cell is already won, play anywhere
-            self.possible = self.getAvailableLargeCells()
-        elif Board.gridIsFull(self.grid[ix,iy]): # If the cell is full play anywhere
-            self.possible = self.getAvailableLargeCells()
+        large_index = Board.getLargeIndex(ix, iy)
+        if self.largeGrid[large_index] != 0: # If the cell is already won, play anywhere
+            self.getAvailableLargeCells()
+        elif Board.gridIsFull(self.grid, 9*large_index): # If the cell is full play anywhere
+            self.getAvailableLargeCells()
         else: # The cell is not won and not full, play in this one
-            self.possible = np.array([[False for _ in range(3)] for _ in range(3)])
-            self.possible[ix,iy] = True
+            self.possible = [large_index]
 
     def getAvailableLargeCells(self):
         '''
@@ -377,19 +392,21 @@ class Board:
         NO INPUT
         Output: 3x3 boolean matrix filled accordingly to the availableness of a large cell
         '''
-        available = np.array([[True for _ in range(3)] for _ in range(3)])
-        nbFull = 0
-        for ix in range(3):
-            for iy in range(3):
-                if self.largeGrid[ix,iy] != 0: # If the cell is already won
-                    available[ix,iy] = False
-                    nbFull += 1
-                elif Board.gridIsFull(self.grid[ix,iy]): # If the cell is full
-                    available[ix,iy] = False
-                    nbFull += 1
-        if self.state == 0 and nbFull == 9:
+        self.possible = []
+        for large_index in range(9):
+            if self.largeGrid[large_index] != 0:
+                pass
+            else:
+                i = 0
+                continuer = True
+                while continuer and (i<9):
+                    if self.grid[9*large_index + i] == 0:
+                        continer = False
+                        self.possible.append(large_index)
+                    i += 1
+
+        if self.state == 0 and len(self.possible) == 0:
             self.state = 3
-        return available
     # ========================================================= #
 
 
@@ -412,7 +429,7 @@ class Board:
         else:
             self.reward -= self.reward_factor * reward
 
-    def reward_update_playing_on(self, ixLarge, iyLarge, ixSmall, iySmall):
+    def reward_update_playing_on(self, large_index, grid_index):
         '''
         Updates the reward playing in the given cell
         INPUT: ixLarge, iyLarge, ixSmall, iySmall (indexes of the small cell)
@@ -420,19 +437,19 @@ class Board:
         '''
         # TODO: do it
         valueLargeGrid_prev = Board.gridValue(self.largeGrid)
-        self.largeGrid[ixLarge,iyLarge] = self.currentPlayer
+        self.largeGrid[large_index] = self.currentPlayer
         valueLargeGrid = Board.gridValue(self.largeGrid)
-        self.largeGrid[ixLarge,iyLarge] = 0
+        self.largeGrid[large_index] = 0
 
-        valueSmallGrid = Board.gridValue(self.grid[ixLarge,iyLarge])
-        self.grid[ixLarge, iyLarge, ixSmall, iySmall] = 0
-        valueSmallGrid_prev = Board.gridValue(self.largeGrid)
-        self.grid[ixLarge, iyLarge, ixSmall, iySmall] = self.currentPlayer
+        valueSmallGrid = Board.gridValue(self.grid, large_index*9)
+        self.grid[grid_index] = 0
+        valueSmallGrid_prev = Board.gridValue(self.grid, large_index*9)
+        self.grid[grid_index] = self.currentPlayer
 
         reward = abs((valueSmallGrid - valueSmallGrid_prev) * (valueLargeGrid - valueLargeGrid_prev))
         self.reward_update(reward)
 
-    def reward_update_winning_large_cell(self, ixLarge, iyLarge):
+    def reward_update_winning_large_cell(self, large_index):
         '''
         Updates the reward winning a given large cell
         INPUT: ixLarge, iyLarge (indexes of the large cell)
@@ -441,9 +458,9 @@ class Board:
         self.reward_reset()
 
         valueLargeGrid = Board.gridValue(self.largeGrid)
-        self.largeGrid[ixLarge,iyLarge] = 0
+        self.largeGrid[large_index] = 0
         valueLargeGrid_prev = Board.gridValue(self.largeGrid)
-        self.largeGrid[ixLarge,iyLarge] = self.currentPlayer
+        self.largeGrid[large_index] = self.currentPlayer
 
         reward = abs(20 * (valueLargeGrid - valueLargeGrid_prev))
         self.reward_update(reward)
@@ -517,7 +534,8 @@ class Board:
         s = Board.getSizeLargeCell()
         for ix in range(3):
             for iy in range(3):
-                gridValue = self.largeGrid[ix,iy]
+                large_index = Board.getLargeIndex(ix, iy)
+                gridValue = self.largeGrid[large_index]
                 pos = Board.getLargeTopLeftPx(ix, iy)
                 color = Board.COLOR_BACKGROUND
                 if gridValue == 1:
@@ -525,7 +543,7 @@ class Board:
                 elif gridValue == 2:
                     color = Board.COLOR_BACKGROUND_PLAYER_2
                 elif blinkAvailableCells and (self.state == 0): # Blink possible moves
-                    if self.possible[ix,iy]:
+                    if large_index in self.possible:
                         if current_milli_time() % Board.TIME_BLINK_AVAILABLE > 0.5 * Board.TIME_BLINK_AVAILABLE:
                             color = Board.COLOR_BACKGROUND_AVAILABLE
                 pygame.draw.rect(screen, color, (pos[0], pos[1], s, s))
@@ -548,7 +566,8 @@ class Board:
             for iyLarge in range(3):
                 for ixSmall in range(3):
                     for iySmall in range(3):
-                        gridValue = self.grid[ixLarge,iyLarge,ixSmall,iySmall]
+                        grid_index = Board.getIndex(ixLarge, iyLarge, ixSmall, iySmall)
+                        gridValue = self.grid[grid_index]
                         pos = Board.getSmallMidddlePx(ixLarge, iyLarge, ixSmall, iySmall)
                         if gridValue == 1: # Crosses
                             pygame.draw.line(screen, Board.COLOR_PLAYER_1, (pos[0] - inc, pos[1] - inc), (pos[0] + inc, pos[1] + inc), width = Board.WIDTH_PLAYER_1)
@@ -575,7 +594,7 @@ class Board:
         (ixLarge, iyLarge, ixSmall, iySmall) = Board.getCellFromPx(px, py)
         if (ixLarge >= 3) or (iyLarge >= 3) or (ixSmall >= 3) or (iySmall >= 3): # Out of bounds
             return -1
-        return 27*ixLarge + 9*iyLarge + 3*ixSmall + iySmall
+        return Board.getIndex(ixLarge, iyLarge, ixSmall, iySmall)
 
     def click(self, px, py):
         '''
@@ -600,12 +619,10 @@ class Board:
         Output: list of moves (a move is represented as an int: 27 * ixLarge + 9* iyLarge + 3*ixSmall + iySmall)
         '''
         moves = []
-        for ixLarge in range(3):
-            for iyLarge in range(3):
-                if self.possible[ixLarge,iyLarge]:
-                    for ixSmall in range(3):
-                        for iySmall in range(3):
-                            if self.grid[ixLarge,iyLarge,ixSmall,iySmall] == 0:
-                                moves.append(27 * ixLarge + 9* iyLarge + 3*ixSmall + iySmall)
+        for large_index in self.possible:
+            for i in range(9):
+                grid_index = 9*large_index + i
+                if self.grid[grid_index] == 0:
+                    moves.append(grid_index)
         return moves
     # ========================================================= #

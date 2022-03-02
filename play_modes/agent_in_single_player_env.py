@@ -4,11 +4,11 @@
 import sys
 sys.path.append("C:\\Users\\Marie\\Organisation_Marie\\X\\3A\\INF 581 - Advanced machine learning\\Project\\UltimateTicTacToe-RL")
 '''
-"""
+
 # for Astrid
 import sys
 sys.path.append("/home/astrid/Documents/X/3A/P2/INF581 - Machine Learning and Autonomous Agents/project/UltimateTicTacToe-RL/")
-"""
+
 
 from envs.env_single_player import SinglePlayerEnv
 import pygame
@@ -20,13 +20,13 @@ from agents.agent_minimax_pruning import MinimaxPruningAgent
 from agents.agent_mcts import MCTSAgent
 
 #agent = MinimaxPruningAgent(1, 5, True)
-agent = MCTSAgent(1, 3000)
+agent = MCTSAgent(1, 2000)
 #agent = MinimaxPruningAgent(1)
 display = True
 
 if __name__ == '__main__':
-    #agent2 = MinimaxPruningAgent(2, 5, True)
     agent2 = MinimaxPruningAgent(2, 5, True)
+    #agent2 = RandomAgent(1)
     env = SinglePlayerEnv(agent2)
     obs = env.reset()
 
@@ -45,7 +45,6 @@ if __name__ == '__main__':
             # Otherwise, if the action is valid we play it in the env
             elif action < 81:
                 obs, reward, done, info = env.step(action)
-                print("REWARD:", reward)
 
         if display:
             # Render the environment
