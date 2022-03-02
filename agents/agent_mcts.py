@@ -39,34 +39,30 @@ def getResult(winner, player):
         
 def UCT(rootEnv, previousPlayer, nb_iter):
     rootNode = Node(rootEnv, previousPlayer)
+    rootState = rootEnv.getState()
 
     for i in range(nb_iter):
-        #print("     "+str(i))
         node = rootNode
-        env = rootEnv #not a deep copy but we restore rootEnv later on
-        rootState = rootEnv.getState()
-
         # Selection
         while node.untriedActions == [] and node.children != []:
             # explore tree until a node can be expanded/is terminal
             node = node.selectChild()
-            env.fast_step(node.previousAction) #TODO: check if modifies action maybe?
+            rootEnv.ultra_fast_step(node.previousAction) #TODO: check if modifies action maybe?
         #print("         selection")
 
         # Expansion
         if node.untriedActions != []:
             # node is not terminal
             action = random.choice(node.untriedActions)
-            env.fast_step(action) #TODO: check if modifies action maybe?
-            node = node.addChild(action, env) # add child and get it as current node
+            done = rootEnv.ultra_fast_step(action) #TODO: check if modifies action maybe?
+            node = node.addChild(action, rootEnv) # add child and get it as current node
         #print("         expansion")
 
         # Simulation
-        done = False
         while not done:
-            actions = env.valid_actions()
-            _, done = env.fast_step(random.choice(actions))
-        winner = env.pygame.board.state
+            actions = rootEnv.valid_actions()
+            done = rootEnv.ultra_fast_step(random.choice(actions))
+        winner = rootEnv.pygame.board.state
         #print("         simulation")
         
         # Back Propagation
@@ -80,7 +76,7 @@ def UCT(rootEnv, previousPlayer, nb_iter):
         #print("         backpropagation")
 
         #restore rootEnv
-        env.restoreFromState(rootState)
+        rootEnv.restoreFromState(rootState)
 
     #return the best child of the root node
     sortedChildren = sorted(rootNode.children, key = lambda node: node.visits)

@@ -28,6 +28,11 @@ class TwoPlayerEnv(gym.Env):
         reward = self.pygame.evaluate()
         done = self.pygame.is_done()
         return reward, done
+    
+    def ultra_fast_step(self, action): #does not compute reward
+        self.pygame.do_action_ultra_fast(action)
+        done = self.pygame.is_done()
+        return done        
 
     def render(self, mode="human", close=False):
         self.pygame.view(False)

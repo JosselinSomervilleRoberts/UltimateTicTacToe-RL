@@ -20,12 +20,13 @@ from agents.agent_minimax_pruning import MinimaxPruningAgent
 from agents.agent_mcts import MCTSAgent
 
 #agent = MinimaxPruningAgent(1, 5, True)
-agent = MCTSAgent(1, 1000)
+agent = MCTSAgent(1, 3000)
+#agent = MinimaxPruningAgent(1)
 display = True
 
 if __name__ == '__main__':
     #agent2 = MinimaxPruningAgent(2, 5, True)
-    agent2 = PlayerAgent(2)
+    agent2 = MinimaxPruningAgent(2, 5, True)
     env = SinglePlayerEnv(agent2)
     obs = env.reset()
 
