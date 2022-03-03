@@ -11,6 +11,9 @@ import tqdm
 
 ## agent
 
+def processObs(observation):
+    return np.array(observation[0] + observation[1] +[1 if i in observation[2] else 0 for i in range(9)]).flatten()
+
 class ReplayBuffer(object):
     def __init__(self, state_len, mem_size):
         self.state_len = state_len
@@ -77,16 +80,16 @@ class DQNAgent(Agent):
 
     def __init__(self, player = 1, env = gym.make('LunarLander-v2'), loading=True, name = ""):
 
-        learning_rate=0.001
+        learning_rate=0.00005
         gamma=0.99
         batch_size=64
-        state_len=len(env.reset())
+        state_len=99#len(env.reset())
         n_actions = env.action_space.n
         mem_size = 1000000
         min_memory_for_training=1000
-        epsilon=1
+        epsilon=0.3
         epsilon_dec=0.998
-        epsilon_min = 0.2
+        epsilon_min = 0.1
         frozen_iterations=6
 
 
@@ -111,7 +114,7 @@ class DQNAgent(Agent):
             self.learnNN(env)
 
     def getAction(self, env, observation, check_validity = True):
-        observation = torch.tensor(np.array(observation), dtype = torch.float32).to(self.q.device)
+        observation = torch.tensor(processObs(observation), dtype = torch.float32).to(self.q.device)
         q = self.q.forward(observation)
         action = int(torch.argmax(q))
 
@@ -179,7 +182,7 @@ class DQNAgent(Agent):
         sum_win = 0
 
         for episode in tqdm.tqdm(range(n_episodes)):
-            state = env.reset()           # resetting the environment after each episode
+            state = env.reset()         # resetting the environment after each episode
             score = 0
             done = 0
             while not done:               # while the episode is not over yet
@@ -190,7 +193,7 @@ class DQNAgent(Agent):
                     action = self.pickActionMaybeMasked(env,state)           # let the agent act
                 new_state,reward, done, error = env.step(action) # performing the action in the environment
                 score += reward                            #  the total score during this round
-                self.replay_buffer.store_transition(state, action, reward, new_state, done)   # store timestep for experiene replay
+                self.replay_buffer.store_transition(processObs(state), action, reward, processObs(new_state), done)   # store timestep for experiene replay
                 self.learn(error)                            # the agent learns after each timestep
                 state = new_state
 

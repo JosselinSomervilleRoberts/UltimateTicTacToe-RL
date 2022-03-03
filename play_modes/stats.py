@@ -6,6 +6,7 @@ sys.path.append("C:\\Users\\Marie\\Organisation_Marie\\X\\3A\\INF 581 - Advanced
 
 # for Astrid
 import sys
+from agents.agent_dqn import DQNAgent
 sys.path.append("/home/astrid/Documents/X/3A/P2/INF581 - Machine Learning and Autonomous Agents/project/UltimateTicTacToe-RL/")
 
 
@@ -19,15 +20,22 @@ from agents.agent_minimax_pruning import MinimaxPruningAgent
 from agents.agent_mcts import MCTSAgent
 import tqdm
 
+
+env = SinglePlayerEnv(RandomAgent(2))
+
 agents1 = [
     RandomAgent(1),
     MinimaxPruningAgent(1,1,True),
     MinimaxPruningAgent(1,3,True),
     MinimaxPruningAgent(1,3,False),
     MinimaxPruningAgent(1,5,True),
+    MinimaxPruningAgent(1,5,False),
     MCTSAgent(1, 100),
     MCTSAgent(1, 500),
-    MCTSAgent(1, 1000)
+    MCTSAgent(1, 1000),
+    MCTSAgent(1, 2500),
+    MCTSAgent(1, 5000),
+    DQNAgent(2, env, True)
 ]
 
 agents2 = [
@@ -36,9 +44,13 @@ agents2 = [
     MinimaxPruningAgent(2,3,True),
     MinimaxPruningAgent(2,3,False),
     MinimaxPruningAgent(2,5,True),
+    MinimaxPruningAgent(2,5,False),
     MCTSAgent(2, 100),
     MCTSAgent(2, 500),
-    MCTSAgent(2, 1000)
+    MCTSAgent(2, 1000),
+    MCTSAgent(2, 2500),
+    MCTSAgent(2, 5000),
+    DQNAgent(2, env, True)
 ]
 
 display = False
@@ -49,7 +61,6 @@ if __name__ == '__main__':
     wins = [[0 for i in range(n)] for j in range(n)]
     equalities = [[0 for i in range(n)] for j in range(n)]
     losses = [[0 for i in range(n)] for j in range(n)]
-    env = SinglePlayerEnv(agents2[0])
 
     for it in tqdm.tqdm(range(N)):
         for i1 in range(n):

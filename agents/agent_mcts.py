@@ -18,7 +18,7 @@ class Node:
     def selectChild(self):
         """select a child of the node using the UCB1 formula which balances exploration/exploitation"""
         #TODO?: possible to multiply one of the terms by a factor to balance exploration and exploitation
-        sortedChildren = sorted(self.children, key=lambda node: node.wins / node.visits + 0.1* math.sqrt(2*math.log(self.visits / node.visits)))
+        sortedChildren = sorted(self.children, key=lambda node: node.wins / node.visits + math.sqrt(2*math.log(self.visits / node.visits)))
         return sortedChildren[-1]
 
     def addChild(self, action, env):

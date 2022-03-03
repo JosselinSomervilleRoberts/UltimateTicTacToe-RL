@@ -18,8 +18,8 @@ from agents.agent_dqn import DQNAgent
 agent2 = RandomAgent(2)#MinimaxPruningAgent(2, 3, True)
 env = SinglePlayerEnv(agent2)
 
-agent = DQNAgent(1, env, True, "_overnight_final")
-#agent.learnNN(env, False, 10000, 500, "_overnight")
+agent = DQNAgent(1, env, True)
+agent.learnNN(env, False, 1000, 1500, "_test")
 display = True
 
 
@@ -41,7 +41,6 @@ if __name__ == '__main__':
             # Otherwise, if the action is valid we play it in the env
             elif action < 81:
                 obs, reward, done, info = env.step(action)
-                print("REWARD:", reward)
 
         if display:
             # Render the environment
