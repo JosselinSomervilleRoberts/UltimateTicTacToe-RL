@@ -15,7 +15,7 @@ class MinimaxPruningAgentSeveralRewards(MinimaxPruningAgent):
             action = super().getAction(env, observation, nbSteps=self.stepMax + self.additionalSteps, rewardMode=1)
             if self.expected_reward*(3-2*self.player) > 50: # The agent with simple reward has forecasted a victory
                 pass
-                #print("ACTION CHOSEN BY SIMPLE: ", self.expected_reward)
+                print("ACTION CHOSEN BY SIMPLE: ", self.expected_reward)
             else: # Use complex reward on less steps
                 action = super().getAction(env, observation, nbSteps=self.stepMax, rewardMode=2)
             return action

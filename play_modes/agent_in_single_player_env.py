@@ -21,12 +21,12 @@ from agents.agent_minimax_several_rewards import MinimaxPruningAgentSeveralRewar
 from agents.agent_mcts import MCTSAgent
 
 #agent = MinimaxPruningAgent(1, 5, True)
-agent = PlayerAgent(1)#MinimaxPruningAgentSeveralRewards(1, 5, False, 3, 15)
+agent = MinimaxPruningAgentSeveralRewards(1, 5, True, 3, 18)#PlayerAgent(1)#MinimaxPruningAgentSeveralRewards(1, 5, False, 3, 15)
 #agent = MinimaxPruningAgent(1)
 display = True
 
 if __name__ == '__main__':
-    agent2 =  MCTSAgent(2, 2000)#MinimaxPruningAgentSeveralRewards(2, 5, False, 2, 15)#MinimaxPruningAgent(2, 5, True)
+    agent2 =  PlayerAgent(2)#MinimaxPruningAgentSeveralRewards(2, 5, True, 2, 15)#MinimaxPruningAgent(2, 5, True)
     #agent2 = RandomAgent(1)
     env = SinglePlayerEnv(agent2)
     obs = env.reset()

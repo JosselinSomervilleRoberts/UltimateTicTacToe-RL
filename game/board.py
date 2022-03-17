@@ -481,7 +481,7 @@ class Board:
             # Win lage cell
             self.largeGrid[large_index] = res
             
-            if True:#not(fast):
+            if not(fast):
                 self.reward.update_winning_large_cell(large_index)
                 move.append(large_index)
 
@@ -490,7 +490,7 @@ class Board:
             if resWin != 0: # A player won
                 self.state = resWin
 
-                if True:#not(fast):
+                if not(fast):
                     self.reward.update_winning()
 
                     # Display winning message
