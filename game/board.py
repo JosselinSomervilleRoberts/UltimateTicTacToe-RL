@@ -7,6 +7,133 @@ def current_milli_time():
     return round(time.time() * 1000)
 
 
+class Reward:
+
+    def __init__(self, board):
+        self.value = 0
+        self.reward_factor = 1
+        self.mode = 1
+        self.board = board
+        self.reset()
+
+    
+
+    def reset(self):
+        '''
+        Simply resets the reward to zero
+        '''
+        self.value = 0
+
+
+
+    def update(self, reward):
+        '''
+        Updates self.reward considering the sign based on the current player
+        INPUT: reward of the move
+        NO OUTPUT -> updates self.reward
+        '''
+        if self.board.currentPlayer == 1:
+            self.value += reward
+        else:
+            self.value -= 1 * reward
+
+
+
+    def update_playing_on(self, large_index, grid_index):
+        '''
+        Updates the reward playing in the given cell
+        INPUT: ixLarge, iyLarge, ixSmall, iySmall (indexes of the small cell)
+        NO OUTPUT -> updates self.reward
+        '''
+        # SUPER-SIMPLE REWARD
+        if self.mode == 0:
+            pass # No reward
+
+        # SIMPLE REWARD
+        elif self.mode == 1:
+            pass # No reward
+
+        # COMPLEX REWARD
+        elif self.mode == 2:
+            valueLargeGrid_prev = Board.gridValue(self.board.largeGrid)
+            self.board.largeGrid[large_index] = self.board.currentPlayer
+            valueLargeGrid = Board.gridValue(self.board.largeGrid)
+            self.board.largeGrid[large_index] = 0
+
+            valueSmallGrid = Board.gridValue(self.board.grid, large_index*9)
+            self.board.grid[grid_index] = 0
+            valueSmallGrid_prev = Board.gridValue(self.board.grid, large_index*9)
+            self.board.grid[grid_index] = self.board.currentPlayer
+
+            reward = abs((valueSmallGrid - valueSmallGrid_prev) * (valueLargeGrid - valueLargeGrid_prev))
+            self.update(reward)
+
+        # ERROR
+        else:
+            print("Error mode in Reward.update_playing_on")
+
+
+
+    def update_winning_large_cell(self, large_index):
+        '''
+        Updates the reward winning a given large cell
+        INPUT: ixLarge, iyLarge (indexes of the large cell)
+        NO OUTPUT -> updates self.reward
+        '''
+        self.reset()
+
+        # SUPER-SIMPLE REWARD
+        if self.mode == 0:
+            pass # No reward
+
+        # SIMPLE REWARD
+        elif self.mode == 1:
+            self.update(10)
+
+        # COMPLEX REWARD
+        elif self.mode == 2:
+            valueLargeGrid = Board.gridValue(self.board.largeGrid)
+            self.board.largeGrid[large_index] = 0
+            valueLargeGrid_prev = Board.gridValue(self.board.largeGrid)
+            self.board.largeGrid[large_index] = self.board.currentPlayer
+
+            reward = abs(20 * (valueLargeGrid - valueLargeGrid_prev))
+            self.update(reward)
+
+        # ERROR
+        else:
+            print("Error mode in Reward.update_winning_large_cell")
+
+
+
+    def update_winning(self):
+        '''
+        Updates the reward winning the game
+        NO INPUT
+        NO OUTPUT -> updates self.reward
+        '''
+        self.reset()
+
+        # SUPER-SIMPLE REWARD
+        if self.mode == 0:
+            self.update(1)
+
+        # SIMPLE REWARD
+        elif self.mode == 1:
+            self.update(100)
+
+        # COMPLEX REWARD
+        elif self.mode == 2:
+            self.update(400)
+
+        # ERROR
+        else:
+            print("Error mode in Reward.update_winning_large_cell")
+
+
+
+
+
 class Board:
     SIZE = 600 #810
     BOTTOM_SIZE = 66 #90
@@ -238,13 +365,13 @@ class Board:
      # ==================== INITIALIZATION ==================== #
     def __init__(self):
         '''Constructor (automatically reset on construct)'''
-        self.reset()
-        self.reward_factor = 1
+        self.reward = Reward(self)
         Board.FONT = pygame.font.Font(None, 50)
+        self.reset()
 
     def reset(self):
         '''Resets the game'''
-        self.reward_reset()
+        self.reward.reset()
         self.resetGrid()
         self.currentPlayer = 1
         self.text = "Player 1 plays"
@@ -281,12 +408,12 @@ class Board:
         elif self.grid[grid_index] != 0:
             return 3, None # Move not aload since the small cell is already occupied
 
-        self.reward_reset()
+        self.reward.reset()
 
         # Play
         self.grid[grid_index] = self.currentPlayer
         move = [self.possible.copy(), grid_index]
-        self.reward_update_playing_on(large_index, grid_index)
+        self.reward.update_playing_on(large_index, grid_index)
 
         # Check if a cell or the game is won
         self.checkWinLargeCell(large_index, move)
@@ -327,7 +454,7 @@ class Board:
         elif self.grid[grid_index] != 0:
             return 3, None # Move not aload since the small cell is already occupied
 
-        self.reward_reset()
+        self.reward.reset()
 
         # Play
         self.grid[grid_index] = self.currentPlayer
@@ -354,8 +481,8 @@ class Board:
             # Win lage cell
             self.largeGrid[large_index] = res
             
-            if not(fast):
-                self.reward_update_winning_large_cell(large_index)
+            if True:#not(fast):
+                self.reward.update_winning_large_cell(large_index)
                 move.append(large_index)
 
             # Check if the game was won
@@ -363,8 +490,8 @@ class Board:
             if resWin != 0: # A player won
                 self.state = resWin
 
-                if not(fast):
-                    self.reward_update_winning()
+                if True:#not(fast):
+                    self.reward.update_winning()
 
                     # Display winning message
                     self.textColor = Board.COLOR_PLAYER_2
@@ -409,117 +536,6 @@ class Board:
             self.state = 3
     # ========================================================= #
 
-
-
-    # =================== REWARD FUNCTIONS ==================== #
-    def reward_reset(self):
-        '''
-        Simply resets the reward to zero
-        '''
-        self.reward = 0
-
-    def reward_update(self, reward):
-        '''
-        Updates self.reward considering the sign based on the current player
-        INPUT: reward of the move
-        NO OUTPUT -> updates self.reward
-        '''
-        if self.currentPlayer == 1:
-            self.reward += reward
-        else:
-            self.reward -= self.reward_factor * reward
-
-    def reward_update_playing_on(self, large_index, grid_index):
-        '''
-        Updates the reward playing in the given cell
-        INPUT: ixLarge, iyLarge, ixSmall, iySmall (indexes of the small cell)
-        NO OUTPUT -> updates self.reward
-        '''
-        # TODO: do it
-        valueLargeGrid_prev = Board.gridValue(self.largeGrid)
-        self.largeGrid[large_index] = self.currentPlayer
-        valueLargeGrid = Board.gridValue(self.largeGrid)
-        self.largeGrid[large_index] = 0
-
-        valueSmallGrid = Board.gridValue(self.grid, large_index*9)
-        self.grid[grid_index] = 0
-        valueSmallGrid_prev = Board.gridValue(self.grid, large_index*9)
-        self.grid[grid_index] = self.currentPlayer
-
-        reward = abs((valueSmallGrid - valueSmallGrid_prev) * (valueLargeGrid - valueLargeGrid_prev))
-        self.reward_update(reward)
-
-    def reward_update_winning_large_cell(self, large_index):
-        '''
-        Updates the reward winning a given large cell
-        INPUT: ixLarge, iyLarge (indexes of the large cell)
-        NO OUTPUT -> updates self.reward
-        '''
-        self.reward_reset()
-
-        valueLargeGrid = Board.gridValue(self.largeGrid)
-        self.largeGrid[large_index] = 0
-        valueLargeGrid_prev = Board.gridValue(self.largeGrid)
-        self.largeGrid[large_index] = self.currentPlayer
-
-        reward = abs(20 * (valueLargeGrid - valueLargeGrid_prev))
-        self.reward_update(reward)
-
-    def reward_update_winning(self):
-        '''
-        Updates the reward winning the game
-        NO INPUT
-        NO OUTPUT -> updates self.reward
-        '''
-        self.reward_reset()
-        reward = 400
-        self.reward_update(reward)
-    """
-    def reward_reset(self):
-        '''
-        Simply resets the reward to zero
-        '''
-        self.reward = 0
-
-    def reward_update(self, reward):
-        '''
-        Updates self.reward considering the sign based on the current player
-        INPUT: reward of the move
-        NO OUTPUT -> updates self.reward
-        '''
-        if self.currentPlayer == 1:
-            self.reward += reward
-        else:
-            self.reward -= self.reward_factor * reward
-
-    def reward_update_playing_on(self, ixLarge, iyLarge, ixSmall, iySmall):
-        '''
-        Updates the reward playing in the given cell
-        INPUT: ixLarge, iyLarge, ixSmall, iySmall (indexes of the small cell)
-        NO OUTPUT -> updates self.reward
-        '''
-        # TODO: do it
-        pass
-
-    def reward_update_winning_large_cell(self, ixLarge, iyLarge):
-        '''
-        Updates the reward winning a given large cell
-        INPUT: ixLarge, iyLarge (indexes of the large cell)
-        NO OUTPUT -> updates self.reward
-        '''
-        reward = 10 # TODO: Change
-        self.reward_update(reward)
-
-    def reward_update_winning(self):
-        '''
-        Updates the reward winning the game
-        NO INPUT
-        NO OUTPUT -> updates self.reward
-        '''
-        reward = 100
-        self.reward_update(reward)
-    """
-    # ========================================================= #
 
 
 

@@ -17,15 +17,16 @@ from agents.agent_player import PlayerAgent
 from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
+from agents.agent_minimax_several_rewards import MinimaxPruningAgentSeveralRewards
 from agents.agent_mcts import MCTSAgent
 
 #agent = MinimaxPruningAgent(1, 5, True)
-agent = MCTSAgent(1, 2000)
+agent = PlayerAgent(1)#MinimaxPruningAgentSeveralRewards(1, 5, False, 3, 15)
 #agent = MinimaxPruningAgent(1)
 display = True
 
 if __name__ == '__main__':
-    agent2 = MinimaxPruningAgent(2, 5, True)
+    agent2 =  MCTSAgent(2, 2000)#MinimaxPruningAgentSeveralRewards(2, 5, False, 2, 15)#MinimaxPruningAgent(2, 5, True)
     #agent2 = RandomAgent(1)
     env = SinglePlayerEnv(agent2)
     obs = env.reset()

@@ -17,6 +17,7 @@ from agents.agent_player import PlayerAgent
 from agents.agent_random import RandomAgent
 from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
+from agents.agent_minimax_several_rewards import MinimaxPruningAgentSeveralRewards
 from agents.agent_mcts import MCTSAgent
 import tqdm
 
@@ -24,39 +25,17 @@ import tqdm
 env = SinglePlayerEnv(RandomAgent(2))
 
 agents1 = [
-    RandomAgent(1),
-    MinimaxPruningAgent(1,1,True),
-    MinimaxPruningAgent(1,3,True),
-    MinimaxPruningAgent(1,3,False),
-    MinimaxPruningAgent(1,5,True),
-    MinimaxPruningAgent(1,5,False),
-    MCTSAgent(1, 100),
-    MCTSAgent(1, 500),
-    MCTSAgent(1, 1000),
-    MCTSAgent(1, 2500),
-    MCTSAgent(1, 5000),
-    DQNAgent(2, env, True)
+    MinimaxPruningAgentSeveralRewards(1, 5, False, 2, 15)
 ]
 
 agents2 = [
-    RandomAgent(2),
-    MinimaxPruningAgent(2,1,True),
-    MinimaxPruningAgent(2,3,True),
-    MinimaxPruningAgent(2,3,False),
-    MinimaxPruningAgent(2,5,True),
-    MinimaxPruningAgent(2,5,False),
-    MCTSAgent(2, 100),
-    MCTSAgent(2, 500),
-    MCTSAgent(2, 1000),
-    MCTSAgent(2, 2500),
-    MCTSAgent(2, 5000),
-    DQNAgent(2, env, True)
+    MCTSAgent(2, 2000)
 ]
 
 display = False
 
 if __name__ == '__main__':
-    N = 40
+    N = 20
     n = len(agents1)
     wins = [[0 for i in range(n)] for j in range(n)]
     equalities = [[0 for i in range(n)] for j in range(n)]
@@ -64,7 +43,7 @@ if __name__ == '__main__':
 
     for it in tqdm.tqdm(range(N)):
         for i1 in range(n):
-            for i2 in range(i1, n):
+            for i2 in range(1):
                 #print(i1,i2)
                 agent = agents1[i1]
                 agent2 = agents2[i2]

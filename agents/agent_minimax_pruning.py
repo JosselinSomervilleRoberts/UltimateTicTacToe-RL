@@ -3,7 +3,10 @@ import random
 INFINITY = 1000
 
 
-def minimaxPruning(env, depth, alpha = - INFINITY, beta = INFINITY, cumulated_reward = 0, done = False, maximize = True, rand = True):
+def minimaxPruning(env, depth, alpha = - INFINITY, beta = INFINITY, cumulated_reward = 0, done = False, maximize = True, rand = True, rewardMode = None):
+    if(rewardMode != None):
+        env.pygame.board.reward.mode = rewardMode
+
     if (depth == 0) or done:
         return None, cumulated_reward
 
@@ -52,13 +55,21 @@ def minimaxPruning(env, depth, alpha = - INFINITY, beta = INFINITY, cumulated_re
 
 class MinimaxPruningAgent(Agent):
 
-    def __init__(self, player = 1, stepMax = 4, rand = True):
+    def __init__(self, player = 1, stepMax = 4, rand = True, rewardMode = 2):
         super().__init__(player)
         self.stepMax = stepMax
         self.rand = rand
+        self.rewardMode = rewardMode
+        self.expected_reward = 0
 
-    def getAction(self, env, observation):
-        action, expected_reward = minimaxPruning(env, self.stepMax, maximize=(self.player == 1), rand=self.rand)
-        #print("Expected reward:", expected_reward)
+    def getAction(self, env, observation, rewardMode = None, nbSteps = None):
+        if rewardMode is None: 
+            rewardMode = self.rewardMode
+
+        if nbSteps is None:
+            nbSteps = self.stepMax
+
+        action, expected_reward = minimaxPruning(env, nbSteps, maximize=(self.player == 1), rand=self.rand, rewardMode=rewardMode)
+        self.expected_reward = expected_reward
         return action
 

@@ -13,6 +13,7 @@ class UltimateTicTacToe:
         self.move = None
         self.action_space = gym.spaces.Discrete(81)
         self.observation_space = gym.spaces.MultiDiscrete([3]*81 + [3]*9 + [2]*9)
+        self.plays = 0
 
     def observe(self):
         return (self.board.grid, self.board.largeGrid, self.board.possible)
@@ -42,7 +43,7 @@ class UltimateTicTacToe:
 
     def evaluate(self):
         if self.error > 0: return -100
-        return self.board.reward
+        return self.board.reward.value
 
     def view(self, blink):
         self.board.draw(self.screen, blink)
