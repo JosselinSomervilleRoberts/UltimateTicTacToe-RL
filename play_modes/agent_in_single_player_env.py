@@ -5,29 +5,36 @@ import sys
 sys.path.append("C:\\Users\\Marie\\Organisation_Marie\\X\\3A\\INF 581 - Advanced machine learning\\Project\\UltimateTicTacToe-RL")
 '''
 
-# for Astrid
-import sys
-sys.path.append("/home/astrid/Documents/X/3A/P2/INF581 - Machine Learning and Autonomous Agents/project/UltimateTicTacToe-RL/")
-
 
 from envs.env_single_player import SinglePlayerEnv
 import pygame
 
 from agents.agent_player import PlayerAgent
 from agents.agent_random import RandomAgent
-from agents.agent_minimax import MinimaxAgent
 from agents.agent_minimax_pruning import MinimaxPruningAgent
 from agents.agent_minimax_several_rewards import MinimaxPruningAgentSeveralRewards
 from agents.agent_mcts import MCTSAgent
+from agents.agent_dqn import DQNAgent
 
+
+# Choose your agent here :
+# uncomment below the agent you want to play against
+# They are ranked by how good they are
+
+# agent = DQNAgent(1)
+#agent = RandomAgent(1)
+#agent = MinimaxPruningAgent(1, 3, True)
+#agent = MCTSAgent(1, 1500)
 #agent = MinimaxPruningAgent(1, 5, True)
-agent = MinimaxPruningAgentSeveralRewards(1, 5, True, 3, 18)#PlayerAgent(1)#MinimaxPruningAgentSeveralRewards(1, 5, False, 3, 15)
-#agent = MinimaxPruningAgent(1)
-display = True
+agent = MinimaxPruningAgentSeveralRewards(1, 5, True, 3, 15)
 
+# A bit slow ...
+#agent = MinimaxPruningAgentSeveralRewards(1, 6, True, 3, 18)
+
+
+display = True
 if __name__ == '__main__':
-    agent2 =  PlayerAgent(2)#MinimaxPruningAgentSeveralRewards(2, 5, True, 2, 15)#MinimaxPruningAgent(2, 5, True)
-    #agent2 = RandomAgent(1)
+    agent2 =  PlayerAgent(2)
     env = SinglePlayerEnv(agent2)
     obs = env.reset()
 

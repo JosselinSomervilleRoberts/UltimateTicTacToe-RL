@@ -83,7 +83,7 @@ class DQNAgent(Agent):
         learning_rate=0.00005
         gamma=0.99
         batch_size=64
-        state_len=99#len(env.reset())
+        state_len=99
         n_actions = env.action_space.n
         mem_size = 1000000
         min_memory_for_training=1000
@@ -105,7 +105,7 @@ class DQNAgent(Agent):
         self.mem_size = mem_size
 
         self.min_memory_for_training = min_memory_for_training
-        self.q = DQNetwork(state_len, n_actions, learning_rate)
+        self.q = DQNetwork(state_len, 81, learning_rate)
         self.replay_buffer = ReplayBuffer(self.state_len, mem_size)
 
         if loading :
