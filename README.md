@@ -1,5 +1,9 @@
 # UltimateTicTacToe-RL
 
+For more details about the project, please visit: https://josselinsomervilleroberts.github.io/
+
+![image](https://github.com/JosselinSomervilleRoberts/JosselinSomervilleRoberts.github.io/blob/main/images/projects/ultimate_tic_tac_toe/ultimate%20tic%20tac%20toe.png)
+
 The goal is to design an AI using RL to play Ultimate Tic Tac Toe.
 
 See the paper to learn the rules.
